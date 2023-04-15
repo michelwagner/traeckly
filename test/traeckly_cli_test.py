@@ -1,5 +1,5 @@
 import traeckly_cli
-import unittest   # The test framework
+import unittest
 
 class Test_Traeckli_cli(unittest.TestCase):
     def test_traeckly_cli_argument_parsing(self):
