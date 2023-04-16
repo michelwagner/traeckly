@@ -2,7 +2,7 @@ from traeckly_sqlite3 import TraecklySQLiteBackend
 from traeckly_logging import TraecklyLoggingBackend
 from console_report import ConsoleReport
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def create_backend():
@@ -30,12 +30,23 @@ def parse_arguments(arguments = None):
 
 
 def get_from_to_isotimes(timespan):
-    try:
-        t1_iso = datetime.fromisoformat(timespan[0]).isoformat(timespec='seconds')
-        t2_iso = datetime.fromisoformat(timespan[1]).isoformat(timespec='seconds')
-    except:
-        t1_iso = ''
-        t2_iso = ''
+    t1_iso = ''
+    t2_iso = ''
+
+    if (len(timespan) == 1):
+        try:
+            now = datetime.now()
+            delta_in_days = timedelta(days = int(timespan[0]))
+            t1_iso = (now - delta_in_days).isoformat(timespec='seconds')
+            t2_iso = now.isoformat(timespec='seconds')
+        except:
+            pass
+    elif (len(timespan) == 2):
+        try:
+            t1_iso = datetime.fromisoformat(timespan[0]).isoformat(timespec='seconds')
+            t2_iso = datetime.fromisoformat(timespan[1]).isoformat(timespec='seconds')
+        except:
+            pass
         
     return (t1_iso, t2_iso)
 
@@ -49,7 +60,7 @@ if __name__ == "__main__":
     if (args['command'] == "stop"):
         backend.start_task(None)
     elif (args['command'] == "report"):
+        (from_time, to_time) = get_from_to_isotimes(args['timespan'])
+        task_data = backend.get_task_durations(from_time, to_time)
         report = ConsoleReport()
-        from_to_times = get_from_to_isotimes(args['timespan'])
-        task_data = backend.get_task_durations(from_to_times[0], from_to_times[1])
         report.create_report(task_data)
