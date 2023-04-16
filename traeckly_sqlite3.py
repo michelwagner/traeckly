@@ -1,17 +1,24 @@
-import sys
-from traeckly_service import TraecklyBackendInterface, TraecklyService
+from traeckly_service import TraecklyBackendInterface
 from datetime import datetime
 import time
 import sqlite3
 
-# SELECT id,starttime FROM tracking ORDER BY id DESC LIMIT 1
-# UPDATE tracking SET duration=77 WHERE ROWID=7
-# INSERT INTO tracking VALUES (NULL, 'Task-Name', 1, '07:45:00', 0)
-# SELECT id, task, starttime, SUM(duration) FROM tracking WHERE starttime BETWEEN '2022-04-13 00:00:00' AND '2024-04-13 23:59:59' GROUP BY task
+database = 'tracking.sql'
 
 class TraecklySQLiteBackend(TraecklyBackendInterface):
+    sql_start_task = "INSERT INTO tracking VALUES (NULL, '{}', '{}', NULL)"
+    sql_get_last_task = "SELECT id, starttime, duration FROM tracking ORDER BY id DESC LIMIT 1"
+    sql_update_duration = "UPDATE tracking SET duration={} WHERE id={}"
+    sql_sum_task_duration_from_to = "SELECT task, SUM(duration) FROM tracking WHERE starttime BETWEEN '{}' AND '{}' GROUP BY task"
+    sql_create_table = """CREATE TABLE "tracking" (
+        "id" INTEGER,
+        "task" TEXT,
+        "starttime" INTEGER,
+        "duration" INTEGER DEFAULT NULL,
+        PRIMARY KEY("id"))"""
+
     def __init__(self):
-        self.conn = sqlite3.connect('tracking.sql')
+        self.conn = sqlite3.connect(database)
         self.cursor = self.conn.cursor()
 
 
@@ -21,26 +28,19 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
 
 
     def create_database(self):
-        self.database_execute("""
-                    CREATE TABLE "tracking" (
-                	"id" INTEGER,
-                	"task" TEXT,
-                	"starttime" INTEGER,
-                	"duration" INTEGER DEFAULT NULL,
-                	PRIMARY KEY("id"))
-            """)
+        self.database_execute(self.sql_create_table)
         
 
     def start_task(self, id):
         self.update_duration_of_last_task()
-        self.database_execute("INSERT INTO tracking VALUES (NULL, '{}', '{}', NULL)".format(id, self.get_isotimestring()))
+        self.database_execute(self.sql_start_task.format(id, self.get_isotimestring()))
         self.conn.commit()
 
 
     def update_duration_of_last_task(self):
         isotimestring_now = self.get_isotimestring()
 
-        a = self.database_execute("SELECT id, starttime, duration FROM tracking ORDER BY id DESC LIMIT 1")
+        a = self.database_execute(self.sql_get_last_task)
         d = a.fetchone()
         if (d != None):
             duration = d[2]
@@ -54,8 +54,23 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
                 d = t2-t1
                 duration = d.total_seconds()
 
-                self.database_execute("UPDATE tracking SET duration={} WHERE id={}".format(duration, row_id))
+                self.database_execute(self.sql_update_duration.format(duration, row_id))
         
+
+    def get_task_durations(self, from_isotime, to_isotime):
+        result = self.database_execute(self.sql_sum_task_duration_from_to.format(from_isotime, to_isotime))
+        entries = result.fetchall()
+        tasks = []
+        for entry in entries:
+            task_name = entry[0]
+            task_duration_seconds = entry[1]
+            task_duration_string = self.format_time_difference(task_duration_seconds)
+            task = (task_name, task_duration_string)
+            tasks.append(task)
+            
+        return tasks
+        
+
 
     def get_isotimestring(self):
         return time.strftime('%Y-%m-%d %H:%M:%S')
@@ -64,15 +79,24 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
     def database_execute(self, statement):
         return self.cursor.execute(statement)
 
+
+    def format_time_difference(self, delta_time_seconds):
+        hours = delta_time_seconds // 3600
+        minutes = round((delta_time_seconds - (hours * 3600.0)) / 60.0)
+        return "{}:{:02d}".format(hours, minutes)
+
         
 if __name__ == "__main__":
     print('sqlite3 backend')
 
     backend = TraecklySQLiteBackend()
-    service = TraecklyService(backend)
+    # service = TraecklyService(backend)
     
-    service.start_task('Task-123')
-    time.sleep(5)
-    service.start_task('Break')
-    time.sleep(2)
-    service.start_task('Task-123')
+    # backend.start_task('Task-123')
+    # time.sleep(5)
+    # backend.start_task('Break')
+    # time.sleep(2)
+    # backend.start_task('Task-123')
+
+    x = backend.get_task_durations('2023-04-09 11:45:21', '2023-04-16 11:45:21')
+    print(x)

@@ -23,6 +23,9 @@ class TraecklyBackendInterface:
 
     def start_task(self, id):
         pass
+    
+    def get_task_durations(self, from_isotime, to_isotime):
+        pass
 
 
 
