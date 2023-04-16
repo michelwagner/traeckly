@@ -29,6 +29,15 @@ class TraecklyBackendInterface:
 
 
 
+class TraecklyReportInterface:
+    def __init__(self):
+        pass
+
+    def create_report(self, data):
+        pass
+
+
+
 class TraecklyService(TraecklyServiceInterface):
     def __init__(self, backend):
         self._backend = backend

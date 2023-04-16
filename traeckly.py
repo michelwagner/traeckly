@@ -1,22 +1,8 @@
 from traeckly_sqlite3 import TraecklySQLiteBackend
 from traeckly_logging import TraecklyLoggingBackend
-
-# from traeckly_service import TraecklyService
+from console_report import ConsoleReport
 import argparse
-
-
-def parse_arguments(arguments = None):
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
-
-    parser_start = subparsers.add_parser('start')
-    parser_start.add_argument('start_task')
-
-    parser_create = subparsers.add_parser('report')
-    parser_create.add_argument('-w', '--weekly', action='store_true')
-
-    args = parser.parse_args(arguments)
-    return vars(args)
+from datetime import datetime
 
 
 def create_backend():
@@ -26,12 +12,44 @@ def create_backend():
         return TraecklyLoggingBackend();
 
 
+def parse_arguments(arguments = None):
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest='command')
+
+    parser_start = subparsers.add_parser('start')
+    parser_start.add_argument('task_name')
+
+    parser_start = subparsers.add_parser('stop')
+
+    parser_report = subparsers.add_parser('report')
+    parser_report.add_argument('--out')
+    parser_report.add_argument('timespan', nargs='+')
+
+    args = parser.parse_args(arguments)
+    return vars(args)
+
+
+def get_from_to_isotimes(timespan):
+    try:
+        t1_iso = datetime.fromisoformat(timespan[0]).isoformat(timespec='seconds')
+        t2_iso = datetime.fromisoformat(timespan[1]).isoformat(timespec='seconds')
+    except:
+        t1_iso = ''
+        t2_iso = ''
+        
+    return (t1_iso, t2_iso)
+
+
 if __name__ == "__main__":
     args = parse_arguments()
     backend = create_backend()
-    # service = TraecklyService(backend)
 
-    if ("start_task" in args.keys()):
-        backend.start_task(args['start_task'])
-    elif ("report" in args.keys()):
-        backend.report('2023-04-09 11:45:21', '2023-04-16 11:45:21')
+    if (args['command'] == "start"):
+        backend.start_task(args['task_name'])
+    if (args['command'] == "stop"):
+        backend.start_task(None)
+    elif (args['command'] == "report"):
+        report = ConsoleReport()
+        from_to_times = get_from_to_isotimes(args['timespan'])
+        task_data = backend.get_task_durations(from_to_times[0], from_to_times[1])
+        report.create_report(task_data)

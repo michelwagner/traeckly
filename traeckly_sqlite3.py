@@ -6,20 +6,22 @@ import sqlite3
 database = 'tracking.sql'
 
 class TraecklySQLiteBackend(TraecklyBackendInterface):
-    sql_start_task = "INSERT INTO tracking VALUES (NULL, '{}', '{}', NULL)"
-    sql_get_last_task = "SELECT id, starttime, duration FROM tracking ORDER BY id DESC LIMIT 1"
-    sql_update_duration = "UPDATE tracking SET duration={} WHERE id={}"
-    sql_sum_task_duration_from_to = "SELECT task, SUM(duration) FROM tracking WHERE starttime BETWEEN '{}' AND '{}' GROUP BY task"
-    sql_create_table = """CREATE TABLE "tracking" (
+    sql_create_table = """CREATE TABLE IF NOT EXISTS "tracking" (
         "id" INTEGER,
         "task" TEXT,
         "starttime" INTEGER,
         "duration" INTEGER DEFAULT NULL,
         PRIMARY KEY("id"))"""
+    sql_start_task = "INSERT INTO tracking VALUES (NULL, '{}', '{}', NULL)"
+    sql_get_last_task = "SELECT id, starttime, duration FROM tracking ORDER BY id DESC LIMIT 1"
+    sql_update_duration = "UPDATE tracking SET duration={} WHERE id={}"
+    sql_sum_task_duration_from_to = "SELECT task, SUM(duration) FROM tracking WHERE starttime BETWEEN '{}' AND '{}' GROUP BY task"
+
 
     def __init__(self):
         self.conn = sqlite3.connect(database)
         self.cursor = self.conn.cursor()
+        self.create_database()
 
 
     def __del__(self):
@@ -33,7 +35,10 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
 
     def start_task(self, id):
         self.update_duration_of_last_task()
-        self.database_execute(self.sql_start_task.format(id, self.get_isotimestring()))
+        
+        if (id != None):
+            self.database_execute(self.sql_start_task.format(id, self.get_isotimestring()))
+            
         self.conn.commit()
 
 
@@ -64,16 +69,16 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
         for entry in entries:
             task_name = entry[0]
             task_duration_seconds = entry[1]
-            task_duration_string = self.format_time_difference(task_duration_seconds)
-            task = (task_name, task_duration_string)
-            tasks.append(task)
+            if (task_duration_seconds != None):
+                task_duration_string = self.format_time_difference(task_duration_seconds)
+                task = (task_name, task_duration_string)
+                tasks.append(task)
             
         return tasks
-        
 
 
     def get_isotimestring(self):
-        return time.strftime('%Y-%m-%d %H:%M:%S')
+        return datetime.now().isoformat(timespec='seconds')
 
 
     def database_execute(self, statement):
@@ -84,19 +89,3 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
         hours = delta_time_seconds // 3600
         minutes = round((delta_time_seconds - (hours * 3600.0)) / 60.0)
         return "{}:{:02d}".format(hours, minutes)
-
-        
-if __name__ == "__main__":
-    print('sqlite3 backend')
-
-    backend = TraecklySQLiteBackend()
-    # service = TraecklyService(backend)
-    
-    # backend.start_task('Task-123')
-    # time.sleep(5)
-    # backend.start_task('Break')
-    # time.sleep(2)
-    # backend.start_task('Task-123')
-
-    x = backend.get_task_durations('2023-04-09 11:45:21', '2023-04-16 11:45:21')
-    print(x)
