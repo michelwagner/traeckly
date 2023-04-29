@@ -12,7 +12,7 @@ class ConsoleReport(TraecklyReportInterface):
 
     def create_report(self, data):
         formating = '{}\t{}'
-        print(formating.format('Task', 'Total time'))
+        print(formating.format('Task', 'Time spent'))
         for x in data:
             task_name = x[0]
             total_time = x[1]
