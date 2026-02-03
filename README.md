@@ -8,8 +8,8 @@ Rename `traeckly_gui.json` to `traeckly_gui.user.json` and adapt to your needs.
 
 
 ### Starting tasks
-Starting a task terminates the previous task.
-Stopping stops the previous task without starting a new one.
+Starting a task terminates the current task.
+Stopping a task stops the current task without starting a new one.
 
 `traekly.py start TASK_A` starts Task A.  
 `traekly.py start TASK_B` stops Task A and starts Task B.  
@@ -17,14 +17,20 @@ Stopping stops the previous task without starting a new one.
 
 
 ### Creating a report for a given period of time
-`traeckly.py report 2023-01-01 2023-01-31`
+`traeckly.py report 2025-01-01 2025-01-31`
 
 Calculates the total time spent for each task. 
 
 
 ### Shortcuts
 `trk.bat stop` to terminate the active task (e.g. system shutdown, logoff)  
-`trk_gui.bat` to launch GUI (e.g. system start, logon)  
+`trk_gui.bat` to launch the GUI (e.g. system start, logon)  
+
+
+### Notes for Windows
+To add automatic script execution at poweron, poweroff, logon, logoff:  
+- `gpedit.msc`
+- `taskschd.msc`
 
 
 ### Storage
