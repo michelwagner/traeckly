@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import subprocess
 import tkinter as tk
+import re
 
 
 def load_grid(path: Path):
@@ -71,9 +72,11 @@ def build_ui(cfg_path: Path):
     buttons = []
 
     def on_click(clicked_btn, task):
+        # replace non-printable characters (including whitespace) with '_'
+        task_sanitized = re.sub(r'\W', '_', task) if task else task
         # compose and execute the command
-        if task and command_template:
-            cmd = command_template.format(task)
+        if task_sanitized and command_template:
+            cmd = command_template.format(task_sanitized)
             try:
                 print(f"Running command: {cmd}")
                 subprocess.run(cmd, shell=True)
