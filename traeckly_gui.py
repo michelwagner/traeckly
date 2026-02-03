@@ -71,18 +71,6 @@ def build_ui(cfg_path: Path):
     buttons = []
 
     def on_click(clicked_btn, task):
-        # reset all buttons to normal background
-        for row_buttons in buttons:
-            for b in row_buttons:
-                try:
-                    b.config(bg=bg)
-                except Exception:
-                    pass
-        # set clicked button to active background
-        try:
-            clicked_btn.config(bg=bg_active)
-        except Exception:
-            pass
         # compose and execute the command
         if task and command_template:
             cmd = command_template.format(task)
@@ -91,6 +79,19 @@ def build_ui(cfg_path: Path):
                 subprocess.run(cmd, shell=True)
             except Exception as e:
                 print(f"Error running command: {e}")
+
+            # reset all buttons to normal background
+            for row_buttons in buttons:
+                for b in row_buttons:
+                    try:
+                        b.config(bg=bg)
+                    except Exception:
+                        pass
+            # set clicked button to active background
+            try:
+                clicked_btn.config(bg=bg_active)
+            except Exception:
+                pass
 
     for r in range(rows):
         row_buttons = []
@@ -115,7 +116,7 @@ def build_ui(cfg_path: Path):
 
 
 def main():
-    cfg = Path(__file__).parent / "traeckly_gui.json"
+    cfg = Path(__file__).parent / "traeckly_gui.user.json"
     if not cfg.exists():
         print(f"Config file not found: {cfg}")
         return

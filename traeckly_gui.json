@@ -3,15 +3,19 @@
     "background": "rgb(255,200,200)",
     "background_active": "rgb(200,150,150)",
     "command": "python traeckly.py start {}",
-    "rows": 2,
+    "rows": 3,
     "cols": 3,
     "tiles": [
-        { "row": 0, "col": 0, "title": "A", "task": "A" },
-        { "row": 0, "col": 1, "title": "B", "task": "B" },
-        { "row": 0, "col": 2, "title": "C", "task": "C" },
+        { "row": 0, "col": 0, "title": "t-mass 10", "task": "275001877_t-mass_10" },
+        { "row": 0, "col": 1, "title": "Prowirl-L", "task": "275001969_Prowirl_L" },
+        { "row": 0, "col": 2, "title": "", "task": "" },
 
-        { "row": 1, "col": 0, "title": "E", "task": "E" },
-        { "row": 1, "col": 1, "title": "F", "task": "F" },
-        { "row": 1, "col": 2, "title": "G", "task": "G" }
+        { "row": 1, "col": 0, "title": "Produktpflege", "task": "275002146_Produktpflege" },
+        { "row": 1, "col": 1, "title": "Administratives", "task": "275002153_Administratives" },
+        { "row": 1, "col": 2, "title": "Customer-Complaints", "task": "275002151_Customer_Complaints" },
+
+        { "row": 2, "col": 0, "title": "", "task": "" },
+        { "row": 2, "col": 1, "title": "Pause", "task": "Pause" },
+        { "row": 2, "col": 2, "title": "Feierabend", "task": "Feierabend" }
     ]
 }
