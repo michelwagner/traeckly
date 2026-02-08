@@ -3,6 +3,7 @@ from traeckly_logging import TraecklyLoggingBackend
 from console_report import ConsoleReport
 import argparse
 from datetime import datetime, timedelta
+import re
 
 
 def create_backend():
@@ -69,12 +70,19 @@ def get_from_to_isotimes(timespan):
     return (t1_iso, t2_iso)
 
 
+def sanitize(item: str) -> str:
+    """Replace non-printable characters (including whitespace) with '_'."""
+    return re.sub(r'\W', '_', item) if item else item
+
+
+
+
 if __name__ == "__main__":
     args = parse_arguments()
     backend = create_backend()
 
     if (args['command'] == "start"):
-        backend.start_task(args['task_name'])
+        backend.start_task(sanitize(args['task_name']))
     if (args['command'] == "stop"):
         backend.start_task(None)
     elif (args['command'] == "report"):

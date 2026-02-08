@@ -32,11 +32,6 @@ def parse_command(commands: list, tile: dict) -> str:
     return ""
 
 
-def sanitize(item: str) -> str:
-    """Replace non-printable characters (including whitespace) with '_'."""
-    return re.sub(r'\W', '_', item) if item else item
-
-
 def load_grid(config: dict):
     rows = config["rows"]
     cols = config["cols"]
@@ -48,12 +43,12 @@ def load_grid(config: dict):
         r = int(t.get("row", 0))
         c = int(t.get("col", 0))
         title = str(t.get("title", ""))
-        task = str(t.get("task", ""))
-        task_sanitized = sanitize(task)
-        
         command = str(t.get("command", ""))
+        
         if 0 <= r < rows and 0 <= c < cols:
-            grid[r][c] = {"title": title, "task": task_sanitized, "command": command}
+            grid[r][c] = {"title": title, "command": command}
+            grid[r][c].update(t)  # include all other tile properties for command parsing
+            
     return grid
 
 
