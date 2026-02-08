@@ -11,14 +11,20 @@ class ConsoleReport(TraecklyReportInterface):
 
 
     def create_report(self, data):
-        task_duration_formatting = '{}\t{}'
         from_to_formatting = 'Report from {} to {}'
         print(from_to_formatting.format(data["from"], data["to"]))
-        print(task_duration_formatting.format('Task', 'Time spent'))
-        for x in data["tasks"]:
-            task_name = x[0]
-            total_time = x[1]
-            print(task_duration_formatting.format(task_name, total_time))
+
+        tasks = data.get("tasks", [])
+        # determine the longest task name to align columns
+        max_task_len = max((len(t[0]) for t in tasks), default=len('Task'))
+
+        header_task = 'Task'
+        header_time = 'Time spent'
+        print(f"{header_task.ljust(max_task_len)}\t{header_time}")
+
+        for task_name, total_time in tasks:
+            print(f"{task_name.ljust(max_task_len)}\t{total_time}")
+
 
 if __name__ == "__main__":
     print('console report')
