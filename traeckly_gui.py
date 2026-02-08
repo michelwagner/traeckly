@@ -10,7 +10,7 @@ def load_grid(path: Path):
     rows = int(data.get("rows", 0))
     cols = int(data.get("cols", 0))
     tiles = data.get("tiles", [])
-    window_title = data.get("window_title", "Grid App")
+    window_title = data.get("window_title", "")
     command_template = data.get("command", "")
 
     # color settings (may be "rgb(r,g,b)" or hex)
