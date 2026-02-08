@@ -5,6 +5,11 @@ import tkinter as tk
 import re
 
 
+def load_config(path: Path) -> dict:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return data
+
+
 def parse_command(commands: list, tile: dict) -> str:
     """Look up a command by name from the tile and return the command string.
 
@@ -27,6 +32,11 @@ def parse_command(commands: list, tile: dict) -> str:
     return ""
 
 
+def sanitize(item: str) -> str:
+    """Replace non-printable characters (including whitespace) with '_'."""
+    return re.sub(r'\W', '_', item) if item else item
+
+
 def load_grid(config: dict):
     rows = config["rows"]
     cols = config["cols"]
@@ -39,31 +49,21 @@ def load_grid(config: dict):
         c = int(t.get("col", 0))
         title = str(t.get("title", ""))
         task = str(t.get("task", ""))
+        task_sanitized = sanitize(task)
+        
+        command = str(t.get("command", ""))
         if 0 <= r < rows and 0 <= c < cols:
-            grid[r][c] = {"title": title, "task": task}
+            grid[r][c] = {"title": title, "task": task_sanitized, "command": command}
     return grid
-
-def load_config(path: Path) -> dict:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    return {
-        "rows": int(data.get("rows", 0)),
-        "cols": int(data.get("cols", 0)),
-        "tiles": data.get("tiles", []),
-        "window_title": data.get("window_title", ""),
-        "command": data.get("command", ""),
-        "background": data.get("background", "#FFFFFF"),
-        "background_active": data.get("background_active", "#FFB0B0"),
-    }
-
 
 
 def build_ui(config: dict):
     rows = config["rows"]
     cols = config["cols"]
-    window_title = config["window_title"]
-    command_template = config["command"]
-    background = config["background"]
-    background_active = config["background_active"]
+    window_title = config.get("window_title", "")
+    commands = config.get("commands", [])
+    background = config.get("background", "#FFFFFF")
+    background_active = config.get("background_active", "#FFB0B0")
     grid = load_grid(config)
 
     root = tk.Tk()
@@ -75,18 +75,17 @@ def build_ui(config: dict):
     for r in range(rows):
         root.grid_rowconfigure(r, weight=1)
 
-    # normalize colors for Tkinter
+    # colors for Tkinter
     bg = background
     bg_active = background_active
 
     buttons = []
 
-    def on_click(clicked_btn, task):
-        # replace non-printable characters (including whitespace) with '_'
-        task_sanitized = re.sub(r'\W', '_', task) if task else task
-        # compose and execute the command
-        if task_sanitized and command_template:
-            cmd = command_template.format(task_sanitized)
+    def on_click(clicked_btn, tile):
+        # get command template from commands list via parse_command
+        cmd = parse_command(commands, tile)
+
+        if cmd:
             try:
                 print(f"Running command: {cmd}")
                 subprocess.run(cmd, shell=True)
@@ -110,8 +109,7 @@ def build_ui(config: dict):
         row_buttons = []
         for c in range(cols):
             cell = grid[r][c]
-            title = cell["title"]
-            task = cell["task"]
+            title = cell.get("title", "")
             btn = tk.Button(
                 root,
                 text=title or "",
@@ -119,7 +117,7 @@ def build_ui(config: dict):
                 bg=bg,
                 activebackground=bg,
             )
-            btn.config(command=lambda b=btn, t=task: on_click(b, t))
+            btn.config(command=lambda b=btn, tile=cell: on_click(b, tile))
             btn.grid(row=r, column=c, sticky="nsew", padx=4, pady=4)
             row_buttons.append(btn)
         buttons.append(row_buttons)
@@ -133,6 +131,7 @@ def main():
     if not cfg_path.exists():
         print(f"Config file not found: {cfg_path}")
         return
+    
     config = load_config(cfg_path)
     root = build_ui(config)
     root.mainloop()
