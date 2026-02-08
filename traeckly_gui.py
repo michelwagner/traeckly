@@ -5,12 +5,25 @@ import tkinter as tk
 import re
 
 
-def parse_command(config: dict, command: str) -> str:
-    """Look up a command by name from config and return the command string."""
-    commands = config.get("commands", [])
+def parse_command(commands: list, tile: dict) -> str:
+    """Look up a command by name from the tile and return the command string.
+
+    Template parameters of the form {$(Key)} inside the command string
+    are replaced with the corresponding value from the `tile` dict (or
+    the empty string if the key does not exist).
+    """
+    command_name = tile.get("command", "")
     for cmd in commands:
-        if cmd.get("name") == command:
-            return cmd.get("command", "")
+        if cmd.get("name") == command_name:
+            template = cmd.get("command", "") or ""
+
+            # replace {$(...)} placeholders with tile values
+            def _repl(match):
+                key = match.group(1)
+                val = tile.get(key, "")
+                return str(val)
+
+            return re.sub(r"\{\$\(([^)]+)\)\}", _repl, template)
     return ""
 
 

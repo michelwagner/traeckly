@@ -36,3 +36,7 @@ To add automatic script execution at poweron, poweroff, logon, logoff:
 ### Storage
 By default the task durations are stored in a SQLite database file.  
 To view the data a database viewer such as [DB Browser for SQLite](https://sqlitebrowser.org/) can be used.  
+
+
+### Unit tests
+python -m unittest discover -s test
