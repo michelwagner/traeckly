@@ -5,17 +5,10 @@ import tkinter as tk
 import re
 
 
-def load_grid(path: Path):
-    data = json.loads(path.read_text(encoding="utf-8"))
-    rows = int(data.get("rows", 0))
-    cols = int(data.get("cols", 0))
-    tiles = data.get("tiles", [])
-    window_title = data.get("window_title", "")
-    command_template = data.get("command", "")
-
-    # color settings (may be "rgb(r,g,b)" or hex)
-    background = data.get("background", "#A9A9A9")
-    background_active = data.get("background_active", "#D3D3D3")
+def load_grid(config: dict):
+    rows = config["rows"]
+    cols = config["cols"]
+    tiles = config["tiles"]
 
     # Create an empty grid of titles and tasks
     grid = [[{"title": "", "task": ""} for _ in range(cols)] for _ in range(rows)]
@@ -26,35 +19,30 @@ def load_grid(path: Path):
         task = str(t.get("task", ""))
         if 0 <= r < rows and 0 <= c < cols:
             grid[r][c] = {"title": title, "task": task}
-    return window_title, rows, cols, grid, background, background_active, command_template
+    return grid
+
+def load_config(path: Path) -> dict:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return {
+        "rows": int(data.get("rows", 0)),
+        "cols": int(data.get("cols", 0)),
+        "tiles": data.get("tiles", []),
+        "window_title": data.get("window_title", ""),
+        "command": data.get("command", ""),
+        "background": data.get("background", "#A9A9A9"),
+        "background_active": data.get("background_active", "#D3D3D3"),
+    }
 
 
-def _rgb_to_hex(color: str) -> str:
-    """Convert "rgb(r,g,b)" or "r,g,b" or hex to hex string for Tkinter."""
-    if not isinstance(color, str):
-        return "#A9A9A9"
-    s = color.strip()
-    if s.startswith("#"):
-        return s
-    if s.lower().startswith("rgb"):
-        try:
-            inside = s[s.find("(") + 1:s.find(")")]
-            parts = [int(p.strip()) for p in inside.split(",")]
-            return "#{:02X}{:02X}{:02X}".format(*parts)
-        except Exception:
-            return "#A9A9A9"
-    # try comma separated
-    if "," in s:
-        try:
-            parts = [int(p.strip()) for p in s.split(",")]
-            return "#{:02X}{:02X}{:02X}".format(*parts)
-        except Exception:
-            return "#A9A9A9"
-    return s
 
-
-def build_ui(cfg_path: Path):
-    window_title, rows, cols, grid, background, background_active, command_template = load_grid(cfg_path)
+def build_ui(config: dict):
+    rows = config["rows"]
+    cols = config["cols"]
+    window_title = config["window_title"]
+    command_template = config["command"]
+    background = config["background"]
+    background_active = config["background_active"]
+    grid = load_grid(config)
 
     root = tk.Tk()
     root.title(window_title)
@@ -66,8 +54,8 @@ def build_ui(cfg_path: Path):
         root.grid_rowconfigure(r, weight=1)
 
     # normalize colors for Tkinter
-    bg = _rgb_to_hex(background)
-    bg_active = _rgb_to_hex(background_active)
+    bg = background
+    bg_active = background_active
 
     buttons = []
 
@@ -119,11 +107,12 @@ def build_ui(cfg_path: Path):
 
 
 def main():
-    cfg = Path(__file__).parent / "traeckly_gui.user.json"
-    if not cfg.exists():
-        print(f"Config file not found: {cfg}")
+    cfg_path = Path(__file__).parent / "traeckly_gui.user.json"
+    if not cfg_path.exists():
+        print(f"Config file not found: {cfg_path}")
         return
-    root = build_ui(cfg)
+    config = load_config(cfg_path)
+    root = build_ui(config)
     root.mainloop()
 
 

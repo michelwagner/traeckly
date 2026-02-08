@@ -4,8 +4,8 @@
     "background_active": "rgb(200,150,150)",
     "command": "python traeckly.py start {}",
     "commands": [
-        {"name": "start_trk", "command": "python traeckly.py start {%task%}"},
-        {"name": "stop_trk", "command": "python traeckly.py stop"}
+        { "name": "start_trk", "command": "python traeckly.py start {$(task)}" },
+        { "name": "stop_trk", "command": "python traeckly.py stop" }
     ],
     "onstart": "start_trk",
     "onstop": "stop_trk",
