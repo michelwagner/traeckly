@@ -5,6 +5,15 @@ import tkinter as tk
 import re
 
 
+def parse_command(config: dict, command: str) -> str:
+    """Look up a command by name from config and return the command string."""
+    commands = config.get("commands", [])
+    for cmd in commands:
+        if cmd.get("name") == command:
+            return cmd.get("command", "")
+    return ""
+
+
 def load_grid(config: dict):
     rows = config["rows"]
     cols = config["cols"]
@@ -29,8 +38,8 @@ def load_config(path: Path) -> dict:
         "tiles": data.get("tiles", []),
         "window_title": data.get("window_title", ""),
         "command": data.get("command", ""),
-        "background": data.get("background", "#A9A9A9"),
-        "background_active": data.get("background_active", "#D3D3D3"),
+        "background": data.get("background", "#FFFFFF"),
+        "background_active": data.get("background_active", "#FFB0B0"),
     }
 
 
