@@ -83,7 +83,7 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
             if (task != None):
                 tasks.append(task)
             
-        return tasks
+        return {"from": from_isotime, "to": to_isotime, "tasks": tasks}
 
 
     def get_task_duration(self, task_name, task_duration_seconds):
