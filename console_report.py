@@ -10,20 +10,22 @@ class ConsoleReport(TraecklyReportInterface):
         pass
 
 
+    def pad_and_concat(self, str1, str2, str1_length):
+        """Pad or truncate str1 to length and concatenate with str2."""
+        return str1[:str1_length].ljust(str1_length) + str2
+
+
     def create_report(self, data):
         from_to_formatting = 'Report from {} to {}'
         print(from_to_formatting.format(data["from"], data["to"]))
 
-        tasks = data.get("tasks", [])
+        header = [('Task', 'Time spent')]
+        table = header + data.get("tasks", [])
         # determine the longest task name to align columns
-        max_task_len = max((len(t[0]) for t in tasks), default=len('Task'))
+        max_task_len = min(40, 4 + max((len(t[0]) for t in table), default=0))  # 4 is for padding
 
-        header_task = 'Task'
-        header_time = 'Time spent'
-        print(f"{header_task.ljust(max_task_len)}\t{header_time}")
-
-        for task_name, total_time in tasks:
-            print(f"{task_name.ljust(max_task_len)}\t{total_time}")
+        for task_name, total_time in table:
+            print(self.pad_and_concat(task_name, total_time, max_task_len))
 
 
 if __name__ == "__main__":
