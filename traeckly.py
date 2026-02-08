@@ -40,6 +40,24 @@ def get_from_to_isotimes(timespan):
             t1_iso = (now - delta_in_days).isoformat(timespec='seconds')
             t2_iso = now.isoformat(timespec='seconds')
         except:
+            if (timespan[0].lower() == 'day'):
+                now = datetime.now()
+                # Get beginning of current day (00:00:00)
+                start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+                t1_iso = start_of_day.isoformat(timespec='seconds')
+                t2_iso = now.isoformat(timespec='seconds')
+            if (timespan[0].lower() == 'week'):
+                now = datetime.now()
+                # Get beginning of current week (Monday at 00:00:00)
+                start_of_week = now - timedelta(days=now.weekday())
+                t1_iso = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0).isoformat(timespec='seconds')
+                t2_iso = now.isoformat(timespec='seconds')
+            elif (timespan[0].lower() == 'month'):
+                now = datetime.now()
+                # Get beginning of current month (1st day at 00:00:00)
+                start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                t1_iso = start_of_month.isoformat(timespec='seconds')
+                t2_iso = now.isoformat(timespec='seconds')
             pass
     elif (len(timespan) == 2):
         try:
