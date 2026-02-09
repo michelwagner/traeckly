@@ -22,8 +22,8 @@
         { "row": 2, "col": 1, "title": "Pause", "command": "start", "task": "Pause" },
         { "row": 2, "col": 2, "title": "Feierabend", "command": "stop", "task": "Feierabend" },
 
-        { "row": 3, "col": 0, "title": "Raport Tag", "command": "report", "period": "day" },
-        { "row": 3, "col": 1, "title": "Raport Woche", "command": "report", "period": "week" },
-        { "row": 3, "col": 2, "title": "Paport Monat", "command": "report", "period": "month" }
+        { "row": 3, "col": 0, "title": "Raport Tag", "command": "report", "period": "day", "pushbutton": true },
+        { "row": 3, "col": 1, "title": "Raport Woche", "command": "report", "period": "week", "pushbutton": true },
+        { "row": 3, "col": 2, "title": "Paport Monat", "command": "report", "period": "month", "pushbutton": true }
     ]
 }

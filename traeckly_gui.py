@@ -87,18 +87,19 @@ def build_ui(config: dict):
             except Exception as e:
                 print(f"Error running command: {e}")
 
-            # reset all buttons to normal background
-            for row_buttons in buttons:
-                for b in row_buttons:
-                    try:
-                        b.config(bg=bg)
-                    except Exception:
-                        pass
-            # set clicked button to active background
-            try:
-                clicked_btn.config(bg=bg_active)
-            except Exception:
-                pass
+            if (tile.get("pushbutton", False) == False):
+                # reset all buttons to normal background
+                for row_buttons in buttons:
+                    for b in row_buttons:
+                        try:
+                            b.config(bg=bg)
+                        except Exception:
+                            pass
+                # set clicked button to active background
+                try:
+                    clicked_btn.config(bg=bg_active)
+                except Exception:
+                    pass
 
     for r in range(rows):
         row_buttons = []
@@ -110,7 +111,6 @@ def build_ui(config: dict):
                 text=title or "",
                 wraplength=120,
                 bg=bg,
-                activebackground=bg,
             )
             btn.config(command=lambda b=btn, tile=cell: on_click(b, tile))
             btn.grid(row=r, column=c, sticky="nsew", padx=4, pady=4)
