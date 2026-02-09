@@ -2,11 +2,11 @@
     "window_title": "Traeckly",
     "background": "#FFFFFF",
     "background_active": "#FFB0B0",
-    "commands": [
-        { "name": "start", "command": "python traeckly.py start {$(task)}" },
-        { "name": "stop", "command": "python traeckly.py stop" },
-        { "name": "report", "command": "python traeckly.py report {$(period)}" }
-    ],
+    "commands": {
+        "start": "python traeckly.py start {$(task)}",
+        "stop": "python traeckly.py stop",
+        "report": "python traeckly.py report {$(period)}"
+    },
     "rows": 4,
     "cols": 3,
     "tiles": [

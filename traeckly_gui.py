@@ -10,26 +10,28 @@ def load_config(path: Path) -> dict:
     return data
 
 
-def parse_command(commands: list, tile: dict) -> str:
+def parse_command(commands: dict, tile: dict) -> str:
     """Look up a command by name from the tile and return the command string.
 
     Template parameters of the form {$(Key)} inside the command string
     are replaced with the corresponding value from the `tile` dict (or
-    the empty string if the key does not exist).
+    the empty string if the key does not exist). Returns empty string if
+    the command name is missing or not found in commands.
     """
-    command_name = tile.get("command", "")
-    for cmd in commands:
-        if cmd.get("name") == command_name:
-            template = cmd.get("command", "") or ""
+    command = ""
+    try:
+        template = commands[tile["command"]]
 
-            # replace {$(...)} placeholders with tile values
-            def _repl(match):
-                key = match.group(1)
-                val = tile.get(key, "")
-                return str(val)
+        # replace {$(...)} placeholders with tile values
+        def _repl(match):
+            key = match.group(1)
+            val = tile.get(key, "")
+            return str(val)
 
-            return re.sub(r"\{\$\(([^)]+)\)\}", _repl, template)
-    return ""
+        command = re.sub(r"\{\$\(([^)]+)\)\}", _repl, template)
+    except (KeyError, TypeError):
+        pass
+    return command
 
 
 def load_grid(config: dict):
