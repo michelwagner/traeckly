@@ -6,6 +6,14 @@ import re
 
 
 def load_config(path: Path) -> dict:
+    """Load and parse JSON configuration file.
+    
+    Args:
+        path: Path to the JSON configuration file.
+        
+    Returns:
+        Dictionary containing the parsed configuration.
+    """
     data = json.loads(path.read_text(encoding="utf-8"))
     return data
 
@@ -107,6 +115,19 @@ def create_button(root: tk.Tk, cell: dict, bg: str, font_size: int, on_click, ro
 
 
 def build_ui(config: dict):
+    """Build and configure the main GUI window with button grid.
+    
+    Creates a tkinter window with a grid of buttons based on the configuration.
+    Each button can execute commands when clicked, with visual feedback for
+    active tasks.
+    
+    Args:
+        config: Configuration dictionary containing window settings, commands,
+                colors, font-size, and grid layout.
+                
+    Returns:
+        Configured tk.Tk root window ready to run.
+    """
     window_title = config.get("window_title", "")
     commands = config.get("commands", [])
     background = config.get("background", "#FFFFFF")
@@ -137,6 +158,10 @@ def build_ui(config: dict):
 
 
 def main():
+    """Main entry point for the Traeckly GUI application.
+    
+    Loads the user configuration file and starts the GUI event loop.
+    """
     cfg_path = Path(__file__).parent / "traeckly_gui.user.json"
     if not cfg_path.exists():
         print(f"Config file not found: {cfg_path}")
