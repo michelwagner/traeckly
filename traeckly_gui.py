@@ -36,32 +36,22 @@ def parse_command(commands: dict, tile: dict) -> str:
 
 def wrap_text(text: str, max_chars: int = 15) -> str:
     """Wrap text at whitespace or dashes to fit approximately max_chars per line."""
-    if not text or len(text) <= max_chars:
-        return text
+    if not text or not text.strip() or len(text) <= max_chars:
+        result = text
+    else:
+        words = text.replace('-', '- ').split()
+        result = words[0]
+        current_line_len = len(words[0])
+        
+        for word in words[1:]:
+            if current_line_len + 1 + len(word) <= max_chars:
+                result += ' ' + word
+                current_line_len += 1 + len(word)
+            else:
+                result += '\n' + word
+                current_line_len = len(word)
     
-    words = []
-    for word in text.replace('-', '- ').split():
-        words.append(word)
-    
-    lines = []
-    current_line = []
-    current_length = 0
-    
-    for word in words:
-        word_len = len(word)
-        if current_length + word_len + len(current_line) <= max_chars:
-            current_line.append(word)
-            current_length += word_len
-        else:
-            if current_line:
-                lines.append(' '.join(current_line))
-            current_line = [word]
-            current_length = word_len
-    
-    if current_line:
-        lines.append(' '.join(current_line))
-    
-    return '\n'.join(lines)
+    return result
 
 
 def load_grid(config: dict):
