@@ -55,34 +55,21 @@ def wrap_text(text: str, max_chars: int = 15) -> str:
 
 
 def load_grid(config: dict):
-    rows = config["rows"]
-    cols = config["cols"]
-    tiles = config["tiles"]
-
-    # Create an empty grid of titles and tasks
-    grid = [[{"title": "", "task": ""} for _ in range(cols)] for _ in range(rows)]
-    for t in tiles:
-        r = int(t.get("row", 0))
-        c = int(t.get("col", 0))
-        title = str(t.get("title", ""))
-        command = str(t.get("command", ""))
-        
-        if 0 <= r < rows and 0 <= c < cols:
-            grid[r][c] = {"title": title, "command": command}
-            grid[r][c].update(t)  # include all other tile properties for command parsing
-            
-    return grid
+    # Grid is now directly provided as a nested array in config
+    return config.get("grid", [[]])
 
 
 def build_ui(config: dict):
-    rows = config["rows"]
-    cols = config["cols"]
     window_title = config.get("window_title", "")
     commands = config.get("commands", [])
     background = config.get("background", "#FFFFFF")
     background_active = config.get("background_active", "#FFB0B0")
     font_size = config.get("font-size", 10)
     grid = load_grid(config)
+    
+    # Derive rows and cols from grid structure
+    rows = len(grid)
+    cols = len(grid[0]) if rows > 0 else 0
 
     root = tk.Tk()
     root.title(window_title)

@@ -8,23 +8,26 @@
         "stop": "python traeckly.py stop",
         "report": "python traeckly.py report {$(period)}"
     },
-    "rows": 4,
-    "cols": 3,
-    "tiles": [
-        { "row": 0, "col": 0, "title": "t-mass 10", "command": "start", "task": "275001877_t-mass_10" },
-        { "row": 0, "col": 1, "title": "Prowirl-L", "command": "start", "task": "275001969_Prowirl_L" },
-        { "row": 0, "col": 2, "title": "", "command": "", "task": "" },
-
-        { "row": 1, "col": 0, "title": "Produktpflege", "command": "start", "task": "275002146_Produktpflege" },
-        { "row": 1, "col": 1, "title": "Administratives", "command": "start", "task": "275002153_Administratives" },
-        { "row": 1, "col": 2, "title": "Customer-Complaints", "command": "start", "task": "275002151_Customer_Complaints" },
-
-        { "row": 2, "col": 0, "title": "", "command": "", "task": "" },
-        { "row": 2, "col": 1, "title": "Pause", "command": "start", "task": "Pause" },
-        { "row": 2, "col": 2, "title": "Feierabend", "command": "stop", "task": "Feierabend" },
-
-        { "row": 3, "col": 0, "title": "Raport Tag", "command": "report", "period": "day", "pushbutton": true },
-        { "row": 3, "col": 1, "title": "Raport Woche", "command": "report", "period": "week", "pushbutton": true },
-        { "row": 3, "col": 2, "title": "Paport Monat", "command": "report", "period": "month", "pushbutton": true }
+    "grid": [
+        [
+            { "title": "t-mass 10", "command": "start", "task": "275001877_t-mass_10" },
+            { "title": "Prowirl-L", "command": "start", "task": "275001969_Prowirl_L" },
+            { "title": "", "command": "", "task": "" }
+        ],
+        [
+            { "title": "Produktpflege", "command": "start", "task": "275002146_Produktpflege" },
+            { "title": "Administratives", "command": "start", "task": "275002153_Administratives" },
+            { "title": "Customer-Complaints", "command": "start", "task": "275002151_Customer_Complaints" }
+        ],
+        [
+            { "title": "", "command": "", "task": "" },
+            { "title": "Pause", "command": "start", "task": "Pause" },
+            { "title": "Feierabend", "command": "stop", "task": "Feierabend" }
+        ],
+        [
+            { "title": "Raport Tag", "command": "report", "period": "day", "pushbutton": true },
+            { "title": "Raport Woche", "command": "report", "period": "week", "pushbutton": true },
+            { "title": "Paport Monat", "command": "report", "period": "month", "pushbutton": true }
+        ]
     ]
 }
