@@ -2,6 +2,7 @@
     "window_title": "Traeckly",
     "background": "#FFFFFF",
     "background_active": "#FFB0B0",
+    "font-size": 10,
     "commands": {
         "start": "python traeckly.py start {$(task)}",
         "stop": "python traeckly.py stop",

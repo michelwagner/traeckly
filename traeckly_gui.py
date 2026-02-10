@@ -34,6 +34,36 @@ def parse_command(commands: dict, tile: dict) -> str:
     return command
 
 
+def wrap_text(text: str, max_chars: int = 15) -> str:
+    """Wrap text at whitespace or dashes to fit approximately max_chars per line."""
+    if not text or len(text) <= max_chars:
+        return text
+    
+    words = []
+    for word in text.replace('-', '- ').split():
+        words.append(word)
+    
+    lines = []
+    current_line = []
+    current_length = 0
+    
+    for word in words:
+        word_len = len(word)
+        if current_length + word_len + len(current_line) <= max_chars:
+            current_line.append(word)
+            current_length += word_len
+        else:
+            if current_line:
+                lines.append(' '.join(current_line))
+            current_line = [word]
+            current_length = word_len
+    
+    if current_line:
+        lines.append(' '.join(current_line))
+    
+    return '\n'.join(lines)
+
+
 def load_grid(config: dict):
     rows = config["rows"]
     cols = config["cols"]
@@ -61,6 +91,7 @@ def build_ui(config: dict):
     commands = config.get("commands", [])
     background = config.get("background", "#FFFFFF")
     background_active = config.get("background_active", "#FFB0B0")
+    font_size = config.get("font-size", 10)
     grid = load_grid(config)
 
     root = tk.Tk()
@@ -108,11 +139,12 @@ def build_ui(config: dict):
         for c in range(cols):
             cell = grid[r][c]
             title = cell.get("title", "")
+            wrapped_title = wrap_text(title, max_chars=20)
             btn = tk.Button(
                 root,
-                text=title or "",
-                wraplength=120,
+                text=wrapped_title or "",
                 bg=bg,
+                font=("TkDefaultFont", font_size)
             )
             btn.config(command=lambda b=btn, tile=cell: on_click(b, tile))
             btn.grid(row=r, column=c, sticky="nsew", padx=4, pady=4)
