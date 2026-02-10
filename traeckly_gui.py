@@ -54,40 +54,17 @@ def wrap_text(text: str, max_chars: int = 15) -> str:
     return result
 
 
-def load_grid(config: dict):
-    # Grid is now directly provided as a nested array in config
-    return config.get("grid", [[]])
-
-
-def build_ui(config: dict):
-    window_title = config.get("window_title", "")
-    commands = config.get("commands", [])
-    background = config.get("background", "#FFFFFF")
-    background_active = config.get("background_active", "#FFB0B0")
-    font_size = config.get("font-size", 10)
-    grid = load_grid(config)
-    
-    # Derive rows and cols from grid structure
-    rows = len(grid)
-    cols = len(grid[0]) if rows > 0 else 0
-
-    root = tk.Tk()
-    root.title(window_title)
-
-    # Make grid expandable
+def configure_grid_layout(root: tk.Tk, rows: int, cols: int):
+    """Make grid rows and columns expandable."""
     for c in range(cols):
         root.grid_columnconfigure(c, weight=1)
     for r in range(rows):
         root.grid_rowconfigure(r, weight=1)
 
-    # colors for Tkinter
-    bg = background
-    bg_active = background_active
 
-    buttons = []
-
+def create_click_handler(commands: dict, buttons: list, bg: str, bg_active: str):
+    """Create and return a click handler function for buttons."""
     def on_click(clicked_btn, tile):
-        # get command template from commands list via parse_command
         cmd = parse_command(commands, tile)
 
         if cmd:
@@ -97,7 +74,7 @@ def build_ui(config: dict):
             except Exception as e:
                 print(f"Error running command: {e}")
 
-            if (tile.get("pushbutton", False) == False):
+            if not tile.get("pushbutton", False):
                 # reset all buttons to normal background
                 for row_buttons in buttons:
                     for b in row_buttons:
@@ -110,21 +87,48 @@ def build_ui(config: dict):
                     clicked_btn.config(bg=bg_active)
                 except Exception:
                     pass
+    
+    return on_click
+
+
+def create_button(root: tk.Tk, cell: dict, bg: str, font_size: int, on_click, row: int, col: int):
+    """Create a button for a grid cell."""
+    title = cell.get("title", "")
+    wrapped_title = wrap_text(title, max_chars=20)
+    btn = tk.Button(
+        root,
+        text=wrapped_title or "",
+        bg=bg,
+        font=("TkDefaultFont", font_size)
+    )
+    btn.config(command=lambda b=btn, tile=cell: on_click(b, tile))
+    btn.grid(row=row, column=col, sticky="nsew", padx=4, pady=4)
+    return btn
+
+
+def build_ui(config: dict):
+    window_title = config.get("window_title", "")
+    commands = config.get("commands", [])
+    background = config.get("background", "#FFFFFF")
+    background_active = config.get("background_active", "#FFB0B0")
+    font_size = config.get("font-size", 10)
+    grid = config.get("grid", [[]])
+    
+    rows = len(grid)
+    cols = len(grid[0]) if rows > 0 else 0
+
+    root = tk.Tk()
+    root.title(window_title)
+    
+    configure_grid_layout(root, rows, cols)
+
+    buttons = []
+    on_click = create_click_handler(commands, buttons, background, background_active)
 
     for r in range(rows):
         row_buttons = []
         for c in range(cols):
-            cell = grid[r][c]
-            title = cell.get("title", "")
-            wrapped_title = wrap_text(title, max_chars=20)
-            btn = tk.Button(
-                root,
-                text=wrapped_title or "",
-                bg=bg,
-                font=("TkDefaultFont", font_size)
-            )
-            btn.config(command=lambda b=btn, tile=cell: on_click(b, tile))
-            btn.grid(row=r, column=c, sticky="nsew", padx=4, pady=4)
+            btn = create_button(root, grid[r][c], background, font_size, on_click, r, c)
             row_buttons.append(btn)
         buttons.append(row_buttons)
 
