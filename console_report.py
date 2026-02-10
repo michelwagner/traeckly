@@ -16,8 +16,9 @@ class ConsoleReport(TraecklyReportInterface):
 
 
     def create_report(self, data):
-        from_to_formatting = 'Report from {} to {}'
-        print(from_to_formatting.format(data["from"], data["to"]))
+        from_time = data["from"].replace('T', ' ')
+        to_time = data["to"].replace('T', ' ')
+        print('Report from {} ... {}'.format(from_time, to_time))
 
         header = [('Task', 'Time spent')]
         table = header + data.get("tasks", [])
@@ -31,6 +32,6 @@ class ConsoleReport(TraecklyReportInterface):
 if __name__ == "__main__":
     print('console report')
 
-    data = {'from': '2026-01-01', 'to': '2026-01-02', 'tasks': [('Break', '1:01'), ('Task-007', '0:00'), ('Task-123', '0:34'), ('Task-777', '0:00'), ('Task-778', '2:05')]}
+    data = {'from': '2026-01-01T00:00:00', 'to': '2026-01-02T23:59:59', 'tasks': [('Break', '1:01'), ('Task-007', '0:00'), ('Task-123', '0:34'), ('Task-777', '0:00'), ('Task-778', '2:05')]}
     report = ConsoleReport()
     report.create_report(data)
