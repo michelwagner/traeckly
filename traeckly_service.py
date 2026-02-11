@@ -2,8 +2,6 @@ import logging
 
 
 class TraecklyServiceInterface:
-    def create_task(self, name):
-        pass
 
     def start_task(self, id):
         pass
@@ -42,8 +40,6 @@ class TraecklyService(TraecklyServiceInterface):
     def __init__(self, backend):
         self._backend = backend
 
-    def create_task(self, name):
-        logging.info("{} created".format(name))
 
     def start_task(self, id):
         self._backend.start_task(id)

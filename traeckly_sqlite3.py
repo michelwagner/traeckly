@@ -1,6 +1,5 @@
 from traeckly_service import TraecklyBackendInterface
 from datetime import datetime
-import time
 import sqlite3
 
 database = 'tracking.db'
