@@ -2,6 +2,7 @@
 
 ## Open Issues
  
+- [ ] Implement configuration system for backend selection - Replace hardcoded 'if (True):' in create_backend() with proper configuration mechanism (config file, environment variables, or command-line arguments)
  
 ## Completed
 
