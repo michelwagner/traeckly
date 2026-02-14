@@ -1,45 +1,39 @@
 import logging
-
-
-class TraecklyServiceInterface:
-
-    def start_task(self, id):
-        pass
-
-
-class TraecklyFrontendInterface:
-    def __init__(self):
-        pass
-
-    def show_status(self):
-        pass
+from typing import Optional
 
 
 class TraecklyBackendInterface:
-    def __init__(self):
-        pass
-
-    def start_task(self, id):
+    """Interface for backend implementations that manage task tracking storage."""
+    
+    def start_task(self, id: Optional[str]) -> None:
+        """Start tracking a new task or stop tracking if id is None.
+        
+        Args:
+            id: Task identifier string, or None to stop tracking.
+        """
         pass
     
-    def get_task_durations(self, from_isotime, to_isotime):
+    def get_task_durations(self, from_isotime: str, to_isotime: str) -> dict:
+        """Get task durations for a specified time range.
+        
+        Args:
+            from_isotime: Start time in ISO format.
+            to_isotime: End time in ISO format.
+            
+        Returns:
+            Dictionary with 'from', 'to', and 'tasks' (list of tuples).
+        """
         pass
 
 
 
 class TraecklyReportInterface:
-    def __init__(self):
+    """Interface for report generators that display task tracking data."""
+    
+    def create_report(self, data: dict) -> None:
+        """Generate and display a report from task duration data.
+        
+        Args:
+            data: Dictionary containing 'from', 'to', and 'tasks' keys.
+        """
         pass
-
-    def create_report(self, data):
-        pass
-
-
-
-class TraecklyService(TraecklyServiceInterface):
-    def __init__(self, backend):
-        self._backend = backend
-
-
-    def start_task(self, id):
-        self._backend.start_task(id)

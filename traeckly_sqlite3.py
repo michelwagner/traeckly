@@ -1,5 +1,6 @@
 from traeckly_service import TraecklyBackendInterface
 from datetime import datetime
+from typing import Optional
 import sqlite3
 
 database = 'tracking.db'
@@ -21,7 +22,7 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
     def __init__(self):
         self.conn = sqlite3.connect(database)
         self.cursor = self.conn.cursor()
-        self.create_database()
+        self._create_database()
 
 
     def __del__(self):
@@ -29,23 +30,23 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
         self.conn.close()
 
 
-    def create_database(self):
-        self.database_execute(self.sql_create_table)
+    def _create_database(self):
+        self._database_execute(self.sql_create_table)
         
 
-    def start_task(self, id):
-        self.update_duration_of_last_task()
+    def start_task(self, id: Optional[str]) -> None:
+        self._update_duration_of_last_task()
         
         if (id != None):
-            self.database_execute(self.sql_start_task.format(id, self.get_isotimestring()))
+            self._database_execute(self.sql_start_task.format(id, self._get_isotimestring()))
             
         self.conn.commit()
 
 
-    def update_duration_of_last_task(self):
-        isotimestring_now = self.get_isotimestring()
+    def _update_duration_of_last_task(self):
+        isotimestring_now = self._get_isotimestring()
 
-        a = self.database_execute(self.sql_get_last_task)
+        a = self._database_execute(self.sql_get_last_task)
         d = a.fetchone()
         if (d != None):
             duration = d[2]
@@ -59,35 +60,35 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
                 d = t2-t1
                 duration = d.total_seconds()
 
-                self.database_execute(self.sql_update_duration.format(duration, row_id))
+                self._database_execute(self.sql_update_duration.format(duration, row_id))
         
 
-    def get_task_durations(self, from_isotime, to_isotime):
+    def get_task_durations(self, from_isotime: str, to_isotime: str) -> dict:
         tasks = []
 
-        result = self.database_execute(self.sql_sum_total_duration_from_to.format(from_isotime, to_isotime))
+        result = self._database_execute(self.sql_sum_total_duration_from_to.format(from_isotime, to_isotime))
         entries = result.fetchall()
         total_duration = entries[0][0]
-        task = (self.get_task_duration('Total', total_duration))
+        task = (self._get_task_duration('Total', total_duration))
         if (task != None):
             tasks.append(task)
 
-        result = self.database_execute(self.sql_sum_task_duration_from_to.format(from_isotime, to_isotime))
+        result = self._database_execute(self.sql_sum_task_duration_from_to.format(from_isotime, to_isotime))
         entries = result.fetchall()
 
         for entry in entries:
             task_name = entry[0]
             task_duration_seconds = entry[1]
-            task = (self.get_task_duration(task_name, task_duration_seconds))
+            task = (self._get_task_duration(task_name, task_duration_seconds))
             if (task != None):
                 tasks.append(task)
             
         return {"from": from_isotime, "to": to_isotime, "tasks": tasks}
 
 
-    def get_task_duration(self, task_name, task_duration_seconds):
+    def _get_task_duration(self, task_name, task_duration_seconds):
         if (task_duration_seconds != None):
-            task_duration_string = self.format_time_difference(task_duration_seconds)
+            task_duration_string = self._format_time_difference(task_duration_seconds)
             task = (task_name, task_duration_string)
         else:
             task = None
@@ -95,15 +96,15 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
         return task
 
 
-    def get_isotimestring(self):
+    def _get_isotimestring(self):
         return datetime.now().isoformat(timespec='seconds')
 
 
-    def database_execute(self, statement):
+    def _database_execute(self, statement):
         return self.cursor.execute(statement)
 
 
-    def format_time_difference(self, delta_time_seconds):
+    def _format_time_difference(self, delta_time_seconds):
         hours = delta_time_seconds // 3600
         minutes = round((delta_time_seconds - (hours * 3600.0)) / 60.0)
         return "{}:{:02d}".format(hours, minutes)
