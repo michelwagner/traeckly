@@ -1,11 +1,11 @@
-from traeckly_service import TraecklyBackendInterface
+from traeckly_service import TraecklyBackendBase
 from datetime import datetime
 from typing import Optional
 import sqlite3
 
 database = 'tracking.db'
 
-class TraecklySQLiteBackend(TraecklyBackendInterface):
+class TraecklySQLiteBackend(TraecklyBackendBase):
     sql_create_table = """CREATE TABLE IF NOT EXISTS "tracking" (
         "id" INTEGER,
         "task" TEXT,
@@ -102,9 +102,3 @@ class TraecklySQLiteBackend(TraecklyBackendInterface):
 
     def _database_execute(self, statement):
         return self.cursor.execute(statement)
-
-
-    def _format_time_difference(self, delta_time_seconds):
-        hours = delta_time_seconds // 3600
-        minutes = round((delta_time_seconds - (hours * 3600.0)) / 60.0)
-        return "{}:{:02d}".format(hours, minutes)

@@ -1,10 +1,10 @@
-from traeckly_service import TraecklyBackendInterface
+from traeckly_service import TraecklyBackendBase
 from typing import Optional
 import logging
 import time
 
 
-class TraecklyLoggingBackend(TraecklyBackendInterface):
+class TraecklyLoggingBackend(TraecklyBackendBase):
     """Backend implementation that logs task tracking events to a file.
     
     This backend writes task start/stop events and durations to a log file
@@ -53,19 +53,6 @@ class TraecklyLoggingBackend(TraecklyBackendInterface):
         delta_time = time.time() - self._start_time
         s = self._format_time_difference(delta_time)
         self._log(f"{self._active_task} duration {s}")
-    
-    def _format_time_difference(self, delta_time: float) -> str:
-        """Format time difference in seconds as hours:minutes string.
-        
-        Args:
-            delta_time: Time difference in seconds.
-            
-        Returns:
-            Formatted string in 'H:MM' format.
-        """
-        hours = int(delta_time) // 3600
-        minutes = round((delta_time - (hours * 3600.0)) / 60.0)
-        return f"{hours}:{minutes:02d}"
 
     def _log(self, message: str) -> None:
         """Write a message to the log file.

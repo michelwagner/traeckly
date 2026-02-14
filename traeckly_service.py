@@ -26,6 +26,23 @@ class TraecklyBackendInterface:
         pass
 
 
+class TraecklyBackendBase(TraecklyBackendInterface):
+    """Base class for backend implementations with common utility methods."""
+    
+    def _format_time_difference(self, delta_time_seconds: float) -> str:
+        """Format time difference in seconds as hours:minutes string.
+        
+        Args:
+            delta_time_seconds: Time difference in seconds.
+            
+        Returns:
+            Formatted string in 'H:MM' format.
+        """
+        hours = int(delta_time_seconds) // 3600
+        minutes = round((delta_time_seconds - (hours * 3600.0)) / 60.0)
+        return f"{hours}:{minutes:02d}"
+
+
 
 class TraecklyReportInterface:
     """Interface for report generators that display task tracking data."""
