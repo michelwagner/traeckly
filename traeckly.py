@@ -30,44 +30,89 @@ def parse_arguments(arguments = None):
     return vars(args)
 
 
-def get_from_to_isotimes(timespan):
-    t1_iso = ''
-    t2_iso = ''
+def _get_keyword_range(timespan_key: str) -> tuple[str, str] | None:
+    now = datetime.now()
+    
+    if (timespan_key == 'day'):
+        # get beginning of current day (00:00:00)
+        start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        result = (start_of_day.isoformat(timespec='seconds'), now.isoformat(timespec='seconds'))
+    elif (timespan_key == 'week'):
+        # get beginning of current week (Monday at 00:00:00)
+        start_of_week = now - timedelta(days=now.weekday())
+        start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+        result = (start_of_week.isoformat(timespec='seconds'), now.isoformat(timespec='seconds'))
+    elif (timespan_key == 'month'):
+        # get beginning of current month (1st day at 00:00:00)
+        start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        result = (start_of_month.isoformat(timespec='seconds'), now.isoformat(timespec='seconds'))
+    else:
+        result = None
+
+    return result
+
+
+def _get_days_range(days_text: str) -> tuple[str, str] | None:
+    try:
+        days = int(days_text)
+        now = datetime.now()
+        if (days > 0):
+            start_of_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            delta_in_days = timedelta(days = days - 1)
+            from_time_iso = (start_of_today - delta_in_days).isoformat(timespec='seconds')
+            to_time_iso = now.isoformat(timespec='seconds')
+            result = (from_time_iso, to_time_iso)
+    except:
+        result = None
+
+    return result
+
+
+def _get_two_iso_range(from_text: str, to_text: str) -> tuple[str, str] | None:
+    try:
+        from_time_iso = datetime.fromisoformat(from_text).isoformat(timespec='seconds')
+        to_time_iso = datetime.fromisoformat(to_text).isoformat(timespec='seconds')
+        result = (from_time_iso, to_time_iso)
+    except:
+        result = None
+
+    return result
+
+
+def get_from_to_time_iso(timespan: list[str]) -> tuple[str, str]:
+    """Return ISO-8601 start/end timestamps for a report timespan.
+
+    Args:
+        timespan: A list of one or two strings. If one element is provided, it
+            can be an integer number of days (e.g. ["7"]) or a keyword
+            ("day", "week", "month") for the current period. If two elements
+            are provided, they are treated as ISO-8601 timestamps
+            (e.g. ["2026-02-01T00:00:00", "2026-02-15T23:59:59"]).
+
+    Returns:
+        A tuple of (from_time_iso, to_time_iso). Empty strings are returned if
+        parsing fails.
+    """
+    from_time_iso = ''
+    to_time_iso = ''
 
     if (len(timespan) == 1):
-        try:
-            now = datetime.now()
-            delta_in_days = timedelta(days = int(timespan[0]))
-            t1_iso = (now - delta_in_days).isoformat(timespec='seconds')
-            t2_iso = now.isoformat(timespec='seconds')
-        except:
-            if (timespan[0].lower() == 'day'):
-                now = datetime.now()
-                # Get beginning of current day (00:00:00)
-                start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
-                t1_iso = start_of_day.isoformat(timespec='seconds')
-                t2_iso = now.isoformat(timespec='seconds')
-            if (timespan[0].lower() == 'week'):
-                now = datetime.now()
-                # Get beginning of current week (Monday at 00:00:00)
-                start_of_week = now - timedelta(days=now.weekday())
-                t1_iso = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0).isoformat(timespec='seconds')
-                t2_iso = now.isoformat(timespec='seconds')
-            elif (timespan[0].lower() == 'month'):
-                now = datetime.now()
-                # Get beginning of current month (1st day at 00:00:00)
-                start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-                t1_iso = start_of_month.isoformat(timespec='seconds')
-                t2_iso = now.isoformat(timespec='seconds')
-            pass
+        timespan_0 = timespan[0].lower()
+
+        keyword_range = _get_keyword_range(timespan_0)
+        if (keyword_range is not None):
+            return keyword_range
+
+        days_range = _get_days_range(timespan_0)
+        if (days_range is not None):
+            return days_range
+
     elif (len(timespan) == 2):
-        try:
-            t1_iso = datetime.fromisoformat(timespan[0]).isoformat(timespec='seconds')
-            t2_iso = datetime.fromisoformat(timespan[1]).isoformat(timespec='seconds')
-        except:
-            pass
+        two_range = _get_two_iso_range(timespan[0], timespan[1])
+        if (two_range is not None):
+            return two_range
         
-    return (t1_iso, t2_iso)
+    return (from_time_iso, to_time_iso)
 
 
 def sanitize(item: str) -> str:
@@ -86,7 +131,7 @@ if __name__ == "__main__":
     if (args['command'] == "stop"):
         backend.start_task(None)
     elif (args['command'] == "report"):
-        (from_time, to_time) = get_from_to_isotimes(args['timespan'])
+        (from_time, to_time) = get_from_to_time_iso(args['timespan'])
         task_data = backend.get_task_durations(from_time, to_time)
         report = ConsoleReport()
         report.create_report(task_data)
