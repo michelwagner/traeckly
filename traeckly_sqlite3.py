@@ -34,11 +34,12 @@ class TraecklySQLiteBackend(TraecklyBackendBase):
         self._database_execute(self.sql_create_table)
         
 
-    def start_task(self, id: Optional[str]) -> None:
+    def start_task(self, task_name: Optional[str]) -> None:
         self._update_duration_of_last_task()
         
-        if (id != None):
-            self._database_execute(self.sql_start_task.format(id, self._get_isotimestring()))
+        if (task_name != None):
+            task_name = self._normalize_task_name(task_name)
+            self._database_execute(self.sql_start_task.format(task_name, self._get_isotimestring()))
             
         self.conn.commit()
 

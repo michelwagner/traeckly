@@ -1,9 +1,9 @@
 from traeckly_sqlite3 import TraecklySQLiteBackend
 from traeckly_logging import TraecklyLoggingBackend
+from traeckly_service import TraecklyBackendBase
 from console_report import ConsoleReport
 import argparse
 from datetime import datetime, timedelta
-import re
 
 
 def create_backend():
@@ -13,6 +13,11 @@ def create_backend():
         return TraecklyLoggingBackend();
 
 
+def create_reporter():
+    report = ConsoleReport()
+    return report
+
+    
 def parse_arguments(arguments = None):
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='command')
@@ -93,45 +98,37 @@ def get_from_to_time_iso(timespan: list[str]) -> tuple[str, str]:
         A tuple of (from_time_iso, to_time_iso). Empty strings are returned if
         parsing fails.
     """
-    from_time_iso = ''
-    to_time_iso = ''
+    result = ('', '')
 
     if (len(timespan) == 1):
         timespan_0 = timespan[0].lower()
 
         keyword_range = _get_keyword_range(timespan_0)
         if (keyword_range is not None):
-            return keyword_range
-
-        days_range = _get_days_range(timespan_0)
-        if (days_range is not None):
-            return days_range
+            result = keyword_range
+        else:
+            days_range = _get_days_range(timespan_0)
+            if (days_range is not None):
+                result = days_range
 
     elif (len(timespan) == 2):
         two_range = _get_two_iso_range(timespan[0], timespan[1])
         if (two_range is not None):
-            return two_range
-        
-    return (from_time_iso, to_time_iso)
+            result = two_range
 
-
-def sanitize(item: str) -> str:
-    """Replace non-printable characters (including whitespace) with '_'."""
-    return re.sub(r'\W', '_', item) if item else item
-
-
+    return result
 
 
 if __name__ == "__main__":
     args = parse_arguments()
     backend = create_backend()
 
-    if (args['command'] == "start"):
-        backend.start_task(sanitize(args['task_name']))
+    if (args['command'] == "start"):        
+        backend.start_task(args['task_name'])
     if (args['command'] == "stop"):
         backend.start_task(None)
     elif (args['command'] == "report"):
         (from_time, to_time) = get_from_to_time_iso(args['timespan'])
         task_data = backend.get_task_durations(from_time, to_time)
-        report = ConsoleReport()
+        report = create_reporter()
         report.create_report(task_data)

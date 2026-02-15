@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Optional
 
 
@@ -28,6 +29,11 @@ class TraecklyBackendInterface:
 
 class TraecklyBackendBase(TraecklyBackendInterface):
     """Base class for backend implementations with common utility methods."""
+
+    @staticmethod
+    def _normalize_task_name(item: str) -> str:
+        """Replace non-printable characters (including whitespace) with '_' ."""
+        return re.sub(r'\W', '_', item) if item else item
     
     def _format_time_difference(self, delta_time_seconds: float) -> str:
         """Format time difference in seconds as hours:minutes string.

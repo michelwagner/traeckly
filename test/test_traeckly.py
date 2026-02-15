@@ -127,6 +127,5 @@ class Test_Traeckli_argument_parsing(unittest.TestCase):
         self.assertEqual(from_to_time, ('', ''))
 
 
-
 if __name__ == '__main__':
     unittest.main()
