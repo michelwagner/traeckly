@@ -7,10 +7,10 @@ from datetime import datetime, timedelta
 
 
 def create_backend():
-    if (True):
-        return TraecklySQLiteBackend()
+    if (False):
+        return TraecklySQLiteBackend('tracking.db')
     else:
-        return TraecklyLoggingBackend();
+        return TraecklyLoggingBackend('traeckly.log')
 
 
 def create_reporter():

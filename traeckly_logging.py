@@ -11,14 +11,14 @@ class TraecklyLoggingBackend(TraecklyBackendBase):
     but does not support retrieving historical task duration data.
     """
     
-    def __init__(self):
+    def __init__(self, filename):
         """Initialize the logging backend with default configuration."""
         self._start_time = 0
         self._active_task = None
         logging.basicConfig(
             format='%(asctime)s %(message)s',
             datefmt='%d.%m.%Y %H:%M:%S',
-            filename='traeckly.log',
+            filename=filename,
             encoding='utf-8',
             level=logging.DEBUG
         )

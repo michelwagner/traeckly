@@ -2,15 +2,7 @@ from traeckly_service import TraecklyReportInterface
 
 
 class ConsoleReport(TraecklyReportInterface):
-    def __init__(self):
-        pass
-
-
-    def __del__(self):
-        pass
-
-
-    def _pad_and_concat(self, str1, str2, str1_length):
+    def _pad_and_concat(self, str1: str, str2: str, str1_length: int) -> str:
         """Pad or truncate str1 to length and concatenate with str2."""
         return str1[:str1_length].ljust(str1_length) + str2
 
@@ -28,10 +20,3 @@ class ConsoleReport(TraecklyReportInterface):
         for task_name, total_time in table:
             print(self._pad_and_concat(task_name, total_time, max_task_len))
 
-
-if __name__ == "__main__":
-    print('console report')
-
-    data = {'from': '2026-01-01T00:00:00', 'to': '2026-01-02T23:59:59', 'tasks': [('Break', '1:01'), ('Task-007', '0:00'), ('Task-123', '0:34'), ('Task-777', '0:00'), ('Task-778', '2:05')]}
-    report = ConsoleReport()
-    report.create_report(data)

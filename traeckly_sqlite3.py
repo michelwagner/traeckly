@@ -3,8 +3,6 @@ from datetime import datetime
 from typing import Optional
 import sqlite3
 
-database = 'tracking.db'
-
 class TraecklySQLiteBackend(TraecklyBackendBase):
     sql_create_table = """CREATE TABLE IF NOT EXISTS "tracking" (
         "id" INTEGER,
@@ -19,8 +17,8 @@ class TraecklySQLiteBackend(TraecklyBackendBase):
     sql_sum_total_duration_from_to = "SELECT SUM(duration) FROM tracking WHERE starttime BETWEEN '{}' AND '{}'"
 
 
-    def __init__(self):
-        self.conn = sqlite3.connect(database)
+    def __init__(self, database_path: str):
+        self.conn = sqlite3.connect(database_path)
         self.cursor = self.conn.cursor()
         self._create_database()
 
