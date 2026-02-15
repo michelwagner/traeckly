@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 
 def create_backend():
-    if (False):
+    if (True):
         return TraecklySQLiteBackend('tracking.db')
     else:
         return TraecklyLoggingBackend('traeckly.log')
