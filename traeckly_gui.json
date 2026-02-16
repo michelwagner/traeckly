@@ -22,7 +22,7 @@
         [
             { "title": "", "command": "", "task": "" },
             { "title": "Pause", "command": "start", "task": "Pause" },
-            { "title": "Feierabend", "command": "stop", "task": "Feierabend" }
+            { "title": "Gehen", "command": "stop" }
         ],
         [
             { "title": "Raport Tag", "command": "report", "period": "day", "pushbutton": true },
