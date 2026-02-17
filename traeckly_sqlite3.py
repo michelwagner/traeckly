@@ -70,7 +70,7 @@ class TraecklySQLiteStore(TraecklyStore):
         return result
 
 
-class TraecklyTrackingBackend(TraecklyBackendBase):
+class TraecklyBackend(TraecklyBackendBase):
     """Store-agnostic backend for task tracking data."""
 
     def __init__(self, store: TraecklyStore) -> None:
@@ -142,7 +142,7 @@ class TraecklyTrackingBackend(TraecklyBackendBase):
         return datetime.now().isoformat(timespec='seconds')
 
 
-class TraecklySQLiteBackend(TraecklyTrackingBackend):
+class TraecklySQLiteBackend(TraecklyBackend):
     """Compatibility alias for the legacy SQLite backend name."""
 
     def __init__(self, database_path: str) -> None:

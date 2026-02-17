@@ -1,7 +1,7 @@
 import unittest
 from typing import Optional
 
-from traeckly_sqlite3 import TraecklyTrackingBackend
+from traeckly_sqlite3 import TraecklyBackend
 from traeckly_store import TraecklyStore
 
 
@@ -61,7 +61,7 @@ class FakeStore(TraecklyStore):
         self.closed = True
 
 
-class FixedTimeBackend(TraecklyTrackingBackend):
+class FixedTimeBackend(TraecklyBackend):
     def __init__(self, store: TraecklyStore, times: list[str]) -> None:
         super().__init__(store)
         self._times = iter(times)
