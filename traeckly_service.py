@@ -11,7 +11,7 @@ class TraecklyBackendInterface:
         Args:
             id: Task identifier string, or None to stop tracking.
         """
-        pass
+        raise NotImplementedError()
     
     def get_task_durations(self, from_isotime: str, to_isotime: str) -> dict:
         """Get task durations for a specified time range.
@@ -23,7 +23,7 @@ class TraecklyBackendInterface:
         Returns:
             Dictionary with 'from', 'to', and 'tasks' (list of tuples).
         """
-        pass
+        raise NotImplementedError()
 
 
 class TraecklyBackendBase(TraecklyBackendInterface):
@@ -58,4 +58,4 @@ class TraecklyReportInterface:
         Args:
             data: Dictionary containing 'from', 'to', and 'tasks' keys.
         """
-        pass
+        raise NotImplementedError()

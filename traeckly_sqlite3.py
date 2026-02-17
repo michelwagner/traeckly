@@ -25,42 +25,54 @@ class TraecklySQLiteStore(TraecklyStore):
         self._closed = False
         self.ensure_schema()
 
+
     def __del__(self) -> None:
         if not self._closed:
             self.close()
 
+
     def ensure_schema(self) -> None:
         self._database_execute(self._sql_create_table)
 
+
     def insert_task(self, task_name: str, starttime_isotime: str) -> None:
         self._database_execute(self._sql_start_task, (task_name, starttime_isotime))
+
 
     def get_last_task(self) -> Optional[tuple[int, str, Optional[float]]]:
         result = self._database_execute(self._sql_get_last_task)
         row = result.fetchone()
         return row if row is not None else None
 
+
     def update_duration(self, row_id: int, duration_seconds: float) -> None:
         self._database_execute(self._sql_update_duration, (duration_seconds, row_id))
+
 
     def sum_total_duration(self, from_isotime: str, to_isotime: str) -> Optional[float]:
         result = self._database_execute(self._sql_sum_total_duration_from_to, (from_isotime, to_isotime))
         entry = result.fetchone()
         if entry is None:
-            return None
-        return entry[0]
+            total_duration = None
+        else:
+            total_duration = entry[0]            
+        return total_duration
+
 
     def sum_task_durations(self, from_isotime: str, to_isotime: str) -> list[tuple[str, Optional[float]]]:
         result = self._database_execute(self._sql_sum_task_duration_from_to, (from_isotime, to_isotime))
         return result.fetchall()
 
+
     def commit(self) -> None:
         self.conn.commit()
+
 
     def close(self) -> None:
         self.conn.commit()
         self.conn.close()
         self._closed = True
+
 
     def _database_execute(self, statement: str, params: Optional[tuple[object, ...]] = None) -> sqlite3.Cursor:
         if params is None:
@@ -76,8 +88,10 @@ class TraecklyBackend(TraecklyBackendBase):
     def __init__(self, store: TraecklyStore) -> None:
         self.store = store
 
+
     def close(self) -> None:
         self.store.close()
+
 
     def start_task(self, task_name: Optional[str]) -> None:
         """Start tracking a task or stop tracking if task_name is None."""
@@ -88,6 +102,7 @@ class TraecklyBackend(TraecklyBackendBase):
             self.store.insert_task(task_name, self._get_isotimestring())
 
         self.store.commit()
+
 
     def _update_duration_of_last_task(self) -> None:
         """Update the duration of the most recent task if it is still open."""
@@ -106,6 +121,7 @@ class TraecklyBackend(TraecklyBackendBase):
                 duration = delta.total_seconds()
 
                 self.store.update_duration(row_id, duration)
+
 
     def get_task_durations(self, from_isotime: str, to_isotime: str) -> dict[str, str | list[tuple[str, str]]]:
         """Return total and per-task durations for a time range."""
@@ -127,6 +143,7 @@ class TraecklyBackend(TraecklyBackendBase):
 
         return {"from": from_isotime, "to": to_isotime, "tasks": tasks}
 
+
     def _get_task_duration(self, task_name: str, task_duration_seconds: Optional[float]) -> Optional[tuple[str, str]]:
         """Format a single task duration into a display tuple."""
         if task_duration_seconds is not None:
@@ -134,16 +151,9 @@ class TraecklyBackend(TraecklyBackendBase):
             task = (task_name, task_duration_string)
         else:
             task = None
-
         return task
+
 
     def _get_isotimestring(self) -> str:
         """Return the current time as an ISO-8601 string."""
         return datetime.now().isoformat(timespec='seconds')
-
-
-class TraecklySQLiteBackend(TraecklyBackend):
-    """Compatibility alias for the legacy SQLite backend name."""
-
-    def __init__(self, database_path: str) -> None:
-        super().__init__(TraecklySQLiteStore(database_path))
