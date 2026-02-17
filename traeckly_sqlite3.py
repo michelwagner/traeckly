@@ -91,8 +91,6 @@ class TraecklyTrackingBackend(TraecklyBackendBase):
 
     def _update_duration_of_last_task(self) -> None:
         """Update the duration of the most recent task if it is still open."""
-        isotimestring_now = self._get_isotimestring()
-
         last_task = self.store.get_last_task()
         if last_task is not None:
             duration = last_task[2]
@@ -100,6 +98,7 @@ class TraecklyTrackingBackend(TraecklyBackendBase):
             if duration is None:
                 row_id = last_task[0]
                 isotimestring_start = last_task[1]
+                isotimestring_now = self._get_isotimestring()
 
                 t1 = datetime.fromisoformat(isotimestring_start)
                 t2 = datetime.fromisoformat(isotimestring_now)
