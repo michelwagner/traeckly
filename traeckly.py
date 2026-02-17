@@ -1,6 +1,5 @@
-from traeckly_sqlite3 import TraecklySQLiteBackend
+from traeckly_sqlite3 import TraecklySQLiteStore, TraecklyTrackingBackend
 from traeckly_logging import TraecklyLoggingBackend
-from traeckly_service import TraecklyBackendBase
 from console_report import ConsoleReport
 import argparse
 from datetime import datetime, timedelta
@@ -8,7 +7,7 @@ from datetime import datetime, timedelta
 
 def create_backend():
     if (True):
-        return TraecklySQLiteBackend('tracking.db')
+        return TraecklyTrackingBackend(TraecklySQLiteStore('tracking.db'))
     else:
         return TraecklyLoggingBackend('traeckly.log')
 
