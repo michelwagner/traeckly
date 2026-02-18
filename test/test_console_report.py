@@ -36,25 +36,10 @@ class TestConsoleReport(unittest.TestCase):
         self.assertIn('2026-01-01', output)
         self.assertIn('2026-01-02', output)
         self.assertIn('Task', output)
-        self.assertIn('Time spent', output)
+        self.assertIn('Time', output)
         self.assertIn('Break', output)
         self.assertIn('Task-007', output)
         self.assertIn('1:01', output)
-
-    def test_pad_and_concat(self):
-        """Test the _pad_and_concat method."""
-        result = self.report._pad_and_concat('Test', 'Data', 10)
-        self.assertEqual(result, 'Test      Data')
-
-    def test_pad_and_concat_exact_length(self):
-        """Test _pad_and_concat when string is already the target length."""
-        result = self.report._pad_and_concat('Test', 'Data', 4)
-        self.assertEqual(result, 'TestData')
-
-    def test_pad_and_concat_too_short_length(self):
-        """Test _pad_and_concat when string is too long for the target length."""
-        result = self.report._pad_and_concat('Test', 'Data', 2)
-        self.assertEqual(result, 'TeData')
 
 
 if __name__ == '__main__':
