@@ -1,7 +1,7 @@
-from traeckly_service import TraecklyReportInterface
+from traeckly_service import AbstractTraecklyReport
 
 
-class ConsoleReport(TraecklyReportInterface):
+class ConsoleReport(AbstractTraecklyReport):
     def _pad_and_concat(self, str1: str, str2: str, str1_length: int) -> str:
         """Pad or truncate str1 to length and concatenate with str2."""
         return str1[:str1_length].ljust(str1_length) + str2

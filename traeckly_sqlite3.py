@@ -1,11 +1,11 @@
 from traeckly_service import TraecklyBackendBase
-from traeckly_store import TraecklyStore
+from abstract_traeckly_store import AbstractTraecklyStore
 from datetime import datetime
 from typing import Optional
 import sqlite3
 
 
-class TraecklySQLiteStore(TraecklyStore):
+class TraecklySQLiteStore(AbstractTraecklyStore):
     """SQLite-backed store for task tracking data."""
     _sql_create_table = """CREATE TABLE IF NOT EXISTS "tracking" (
         "id" INTEGER,
@@ -85,7 +85,7 @@ class TraecklySQLiteStore(TraecklyStore):
 class TraecklyBackend(TraecklyBackendBase):
     """Store-agnostic backend for task tracking data."""
 
-    def __init__(self, store: TraecklyStore) -> None:
+    def __init__(self, store: AbstractTraecklyStore) -> None:
         self.store = store
 
 

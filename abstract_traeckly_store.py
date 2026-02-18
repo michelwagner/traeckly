@@ -1,7 +1,7 @@
 from typing import Optional
 
 
-class TraecklyStore:
+class AbstractTraecklyStore:
     """Interface for storage implementations that persist task tracking data."""
 
     def ensure_schema(self) -> None:

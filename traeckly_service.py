@@ -2,7 +2,7 @@ import re
 from typing import Optional
 
 
-class TraecklyBackendInterface:
+class AbstractTraecklyBackend:
     """Interface for backend implementations that manage task tracking storage."""
     
     def start_task(self, id: Optional[str]) -> None:
@@ -26,7 +26,7 @@ class TraecklyBackendInterface:
         raise NotImplementedError()
 
 
-class TraecklyBackendBase(TraecklyBackendInterface):
+class TraecklyBackendBase(AbstractTraecklyBackend):
     """Base class for backend implementations with common utility methods."""
 
     @staticmethod
@@ -49,7 +49,7 @@ class TraecklyBackendBase(TraecklyBackendInterface):
 
 
 
-class TraecklyReportInterface:
+class AbstractTraecklyReport:
     """Interface for report generators that display task tracking data."""
     
     def create_report(self, data: dict) -> None:

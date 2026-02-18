@@ -2,10 +2,10 @@ import unittest
 from typing import Optional
 
 from traeckly_sqlite3 import TraecklyBackend
-from traeckly_store import TraecklyStore
+from abstract_traeckly_store import AbstractTraecklyStore
 
 
-class FakeStore(TraecklyStore):
+class FakeStore(AbstractTraecklyStore):
     def __init__(self) -> None:
         self.entries: list[dict[str, object]] = []
         self.next_id = 1
@@ -62,7 +62,7 @@ class FakeStore(TraecklyStore):
 
 
 class FixedTimeBackend(TraecklyBackend):
-    def __init__(self, store: TraecklyStore, times: list[str]) -> None:
+    def __init__(self, store: AbstractTraecklyStore, times: list[str]) -> None:
         super().__init__(store)
         self._times = iter(times)
 
