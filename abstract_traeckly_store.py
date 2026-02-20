@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List, Tuple
 
 
 class AbstractTraecklyStore:
@@ -12,7 +12,7 @@ class AbstractTraecklyStore:
         """Insert a new task entry with the given start time."""
         raise NotImplementedError()
 
-    def get_last_task(self) -> Optional[tuple[int, str, Optional[float]]]:
+    def get_last_task(self) -> Optional[Tuple[int, str, Optional[float]]]:
         """Return the most recent task row as (id, starttime, duration)."""
         raise NotImplementedError()
 
@@ -24,7 +24,7 @@ class AbstractTraecklyStore:
         """Return the total duration for tasks within a time range."""
         raise NotImplementedError()
 
-    def sum_task_durations(self, from_isotime: str, to_isotime: str) -> list[tuple[str, Optional[float]]]:
+    def sum_task_durations(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
         """Return per-task duration totals within a time range."""
         raise NotImplementedError()
 

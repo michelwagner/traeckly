@@ -1,5 +1,5 @@
 import unittest
-from typing import Optional
+from typing import Optional, List, Dict, Tuple
 
 from traeckly_sqlite3 import TraecklyBackend
 from abstract_traeckly_store import AbstractTraecklyStore
@@ -7,7 +7,7 @@ from abstract_traeckly_store import AbstractTraecklyStore
 
 class FakeStore(AbstractTraecklyStore):
     def __init__(self) -> None:
-        self.entries: list[dict[str, object]] = []
+        self.entries: List[Dict[str, object]] = []
         self.next_id = 1
         self.closed = False
 
@@ -23,7 +23,7 @@ class FakeStore(AbstractTraecklyStore):
         })
         self.next_id += 1
 
-    def get_last_task(self) -> Optional[tuple[int, str, Optional[float]]]:
+    def get_last_task(self) -> Optional[Tuple[int, str, Optional[float]]]:
         if not self.entries:
             return None
         entry = self.entries[-1]
@@ -43,8 +43,8 @@ class FakeStore(AbstractTraecklyStore):
         ]
         return sum(durations) if durations else None
 
-    def sum_task_durations(self, from_isotime: str, to_isotime: str) -> list[tuple[str, Optional[float]]]:
-        totals: dict[str, float] = {}
+    def sum_task_durations(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+        totals: Dict[str, float] = {}
         for entry in self.entries:
             if entry["duration"] is None:
                 continue
@@ -62,7 +62,7 @@ class FakeStore(AbstractTraecklyStore):
 
 
 class FixedTimeBackend(TraecklyBackend):
-    def __init__(self, store: AbstractTraecklyStore, times: list[str]) -> None:
+    def __init__(self, store: AbstractTraecklyStore, times: List[str]) -> None:
         super().__init__(store)
         self._times = iter(times)
 

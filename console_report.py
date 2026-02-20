@@ -1,9 +1,11 @@
+from typing import List, Tuple
+
 from traeckly_service import AbstractTraecklyReport
 
 
 class ConsoleReport(AbstractTraecklyReport):
     @staticmethod
-    def _render_table(rows: list[tuple[str, str]], max_task_len: int = 40) -> list[str]:
+    def _render_table(rows: List[Tuple[str, str]], max_task_len: int = 40) -> List[str]:
         task_width = min(max_task_len, max((len(row[0]) for row in rows), default=0))
         time_width = max((len(row[1]) for row in rows), default=0)
 

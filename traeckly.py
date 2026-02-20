@@ -2,6 +2,7 @@ from traeckly_sqlite3 import TraecklySQLiteStore, TraecklyBackend
 from traeckly_logging import TraecklyLoggingBackend
 from console_report import ConsoleReport
 import argparse
+from typing import Optional, List, Tuple
 from datetime import datetime, timedelta
 
 
@@ -34,7 +35,7 @@ def parse_arguments(arguments = None):
     return vars(args)
 
 
-def _get_keyword_range(timespan_key: str) -> tuple[str, str] | None:
+def _get_keyword_range(timespan_key: str) -> Optional[Tuple[str, str]]:
     now = datetime.now()
     
     if (timespan_key == 'day'):
@@ -56,7 +57,7 @@ def _get_keyword_range(timespan_key: str) -> tuple[str, str] | None:
     return result
 
 
-def _get_days_range(days_text: str) -> tuple[str, str] | None:
+def _get_days_range(days_text: str) -> Optional[Tuple[str, str]]:
     try:
         days = int(days_text)
         now = datetime.now()
@@ -72,7 +73,7 @@ def _get_days_range(days_text: str) -> tuple[str, str] | None:
     return result
 
 
-def _get_two_iso_range(from_text: str, to_text: str) -> tuple[str, str] | None:
+def _get_two_iso_range(from_text: str, to_text: str) -> Optional[Tuple[str, str]]:
     try:
         from_time_iso = datetime.fromisoformat(from_text).isoformat(timespec='seconds')
         to_time_iso = datetime.fromisoformat(to_text).isoformat(timespec='seconds')
@@ -83,7 +84,7 @@ def _get_two_iso_range(from_text: str, to_text: str) -> tuple[str, str] | None:
     return result
 
 
-def get_from_to_time_iso(timespan: list[str]) -> tuple[str, str]:
+def get_from_to_time_iso(timespan: List[str]) -> Tuple[str, str]:
     """Return ISO-8601 start/end timestamps for a report timespan.
 
     Args:

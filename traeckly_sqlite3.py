@@ -1,7 +1,7 @@
 from traeckly_service import TraecklyBackendBase
 from abstract_traeckly_store import AbstractTraecklyStore
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union, List, Tuple, Dict
 import sqlite3
 
 
@@ -39,7 +39,7 @@ class TraecklySQLiteStore(AbstractTraecklyStore):
         self._database_execute(self._sql_start_task, (task_name, starttime_isotime))
 
 
-    def get_last_task(self) -> Optional[tuple[int, str, Optional[float]]]:
+    def get_last_task(self) -> Optional[Tuple[int, str, Optional[float]]]:
         result = self._database_execute(self._sql_get_last_task)
         row = result.fetchone()
         return row if row is not None else None
@@ -59,7 +59,7 @@ class TraecklySQLiteStore(AbstractTraecklyStore):
         return total_duration
 
 
-    def sum_task_durations(self, from_isotime: str, to_isotime: str) -> list[tuple[str, Optional[float]]]:
+    def sum_task_durations(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
         result = self._database_execute(self._sql_sum_task_duration_from_to, (from_isotime, to_isotime))
         return result.fetchall()
 
@@ -74,7 +74,7 @@ class TraecklySQLiteStore(AbstractTraecklyStore):
         self._closed = True
 
 
-    def _database_execute(self, statement: str, params: Optional[tuple[object, ...]] = None) -> sqlite3.Cursor:
+    def _database_execute(self, statement: str, params: Optional[Tuple[object, ...]] = None) -> sqlite3.Cursor:
         if params is None:
             result = self.cursor.execute(statement)
         else:
@@ -123,7 +123,7 @@ class TraecklyBackend(TraecklyBackendBase):
                 self.store.update_duration(row_id, duration)
 
 
-    def get_task_durations(self, from_isotime: str, to_isotime: str) -> dict[str, str | list[tuple[str, str]]]:
+    def get_task_durations(self, from_isotime: str, to_isotime: str) -> Dict[str, Union[str, List[Tuple[str, str]]]]:
         """Return total and per-task durations for a time range."""
         tasks = []
 
@@ -144,7 +144,7 @@ class TraecklyBackend(TraecklyBackendBase):
         return {"from": from_isotime, "to": to_isotime, "tasks": tasks}
 
 
-    def _get_task_duration(self, task_name: str, task_duration_seconds: Optional[float]) -> Optional[tuple[str, str]]:
+    def _get_task_duration(self, task_name: str, task_duration_seconds: Optional[float]) -> Optional[Tuple[str, str]]:
         """Format a single task duration into a display tuple."""
         if task_duration_seconds is not None:
             task_duration_string = self._format_time_difference(task_duration_seconds)
