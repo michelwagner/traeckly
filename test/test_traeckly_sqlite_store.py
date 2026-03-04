@@ -31,6 +31,38 @@ class TestTraecklySQLiteStore(unittest.TestCase):
         self.assertEqual(per_task["Task_A"], 3600.0)
         self.assertEqual(per_task["Task_B"], 1800.0)
 
+    def test_get_task_durations_sum_returns_individual_entries(self) -> None:
+        self.store.insert_task("Task_A", "2026-01-01T00:00:00")
+        last_task = self.store.get_last_task()
+        self.assertIsNotNone(last_task)
+        self.store.update_duration(last_task[0], 3600.0)
+
+        self.store.insert_task("Task_B", "2026-01-01T01:00:00")
+        last_task = self.store.get_last_task()
+        self.assertIsNotNone(last_task)
+        self.store.update_duration(last_task[0], 1800.0)
+
+        self.store.insert_task("Task_A", "2026-01-01T01:30:00")
+        last_task = self.store.get_last_task()
+        self.assertIsNotNone(last_task)
+        self.store.update_duration(last_task[0], 900.0)
+
+        self.store.insert_task("Task_C", "2026-01-01T03:00:00")
+        last_task = self.store.get_last_task()
+        self.assertIsNotNone(last_task)
+        self.store.update_duration(last_task[0], 600.0)
+
+        durations = self.store.get_task_durations_sum("2026-01-01T00:00:00", "2026-01-01T02:00:00")
+
+        self.assertCountEqual(
+            durations,
+            [
+                ("Task_A", 3600.0),
+                ("Task_B", 1800.0),
+                ("Task_A", 900.0),
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

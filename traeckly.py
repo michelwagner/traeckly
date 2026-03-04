@@ -129,6 +129,8 @@ if __name__ == "__main__":
         backend.start_task(None)
     elif (args['command'] == "report"):
         (from_time, to_time) = get_from_to_time_iso(args['timespan'])
+        task_data_sum = backend.get_task_durations_sum(from_time, to_time)
         task_data = backend.get_task_durations(from_time, to_time)
+        
         report = create_reporter()
-        report.create_report(task_data)
+        report.create_report_sum(task_data_sum)

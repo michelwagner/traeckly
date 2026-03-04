@@ -13,7 +13,7 @@ class AbstractTraecklyBackend:
         """
         raise NotImplementedError()
     
-    def get_task_durations(self, from_isotime: str, to_isotime: str) -> dict:
+    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> dict:
         """Get task durations for a specified time range.
         
         Args:
@@ -52,7 +52,7 @@ class TraecklyBackendBase(AbstractTraecklyBackend):
 class AbstractTraecklyReport:
     """Interface for report generators that display task tracking data."""
     
-    def create_report(self, data: dict) -> None:
+    def create_report_sum(self, data: dict) -> None:
         """Generate and display a report from task duration data.
         
         Args:

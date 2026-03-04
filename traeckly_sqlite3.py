@@ -18,6 +18,7 @@ class TraecklySQLiteStore(AbstractTraecklyStore):
     _sql_update_duration = "UPDATE tracking SET duration=? WHERE id=?"
     _sql_sum_task_duration_from_to = "SELECT task, SUM(duration) FROM tracking WHERE starttime BETWEEN ? AND ? GROUP BY task"
     _sql_sum_total_duration_from_to = "SELECT SUM(duration) FROM tracking WHERE starttime BETWEEN ? AND ?"
+    _sql_get_task_durations_from_to = "SELECT task, duration FROM tracking WHERE starttime BETWEEN ? AND ?"
 
     def __init__(self, database_path: str) -> None:
         self.conn = sqlite3.connect(database_path)
@@ -61,6 +62,12 @@ class TraecklySQLiteStore(AbstractTraecklyStore):
 
     def sum_task_durations(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
         result = self._database_execute(self._sql_sum_task_duration_from_to, (from_isotime, to_isotime))
+        return result.fetchall()
+
+
+    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+        """Return individual task durations within a time range."""
+        result = self._database_execute(self._sql_get_task_durations_from_to, (from_isotime, to_isotime))
         return result.fetchall()
 
 
@@ -123,7 +130,7 @@ class TraecklyBackend(TraecklyBackendBase):
                 self.store.update_duration(row_id, duration)
 
 
-    def get_task_durations(self, from_isotime: str, to_isotime: str) -> Dict[str, Union[str, List[Tuple[str, str]]]]:
+    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> Dict[str, Union[str, List[Tuple[str, str]]]]:
         """Return total and per-task durations for a time range."""
         tasks = []
 

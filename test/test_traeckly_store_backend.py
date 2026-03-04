@@ -84,14 +84,14 @@ class TestTraecklyTrackingBackend(unittest.TestCase):
         self.assertEqual(len(store.entries), 1)
         self.assertEqual(store.entries[0]["duration"], 3600.0)
 
-    def test_get_task_durations_formats_output(self) -> None:
+    def test_get_task_durations_sum_formats_output(self) -> None:
         store = FakeStore()
         backend = FixedTimeBackend(store, ["2026-01-01T00:00:00", "2026-01-01T01:00:00"])
 
         backend.start_task("Task A")
         backend.start_task(None)
 
-        result = backend.get_task_durations("2026-01-01T00:00:00", "2026-01-01T02:00:00")
+        result = backend.get_task_durations_sum("2026-01-01T00:00:00", "2026-01-01T02:00:00")
 
         self.assertEqual(result["from"], "2026-01-01T00:00:00")
         self.assertEqual(result["to"], "2026-01-01T02:00:00")

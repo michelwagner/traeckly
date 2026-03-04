@@ -19,13 +19,13 @@ class TestConsoleReport(unittest.TestCase):
             ]
         }
 
-    def test_create_report(self):
-        """Test that create_report runs without errors and produces output."""
+    def test_create_report_sum(self):
+        """Test that create_report_sum runs without errors and produces output."""
         # Capture stdout
         captured_output = StringIO()
         sys.stdout = captured_output
         
-        self.report.create_report(self.data)
+        self.report.create_report_sum(self.data)
         
         # Restore stdout
         sys.stdout = sys.__stdout__

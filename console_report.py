@@ -24,7 +24,7 @@ class ConsoleReport(AbstractTraecklyReport):
         return lines
 
 
-    def create_report(self, data: dict) -> None:
+    def create_report_sum(self, data: dict) -> None:
         from_time = data["from"].replace('T', ' ')
         to_time = data["to"].replace('T', ' ')
         print(f"Report from {from_time} ... {to_time}")

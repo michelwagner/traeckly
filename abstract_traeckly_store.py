@@ -28,6 +28,10 @@ class AbstractTraecklyStore:
         """Return per-task duration totals within a time range."""
         raise NotImplementedError()
 
+    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+        """Return individual task durations within a time range."""
+        raise NotImplementedError()
+
     def commit(self) -> None:
         """Persist pending changes."""
         raise NotImplementedError()
