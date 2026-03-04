@@ -20,12 +20,16 @@ class AbstractTraecklyStore:
         """Update the duration of a task row."""
         raise NotImplementedError()
 
-    def sum_total_duration(self, from_isotime: str, to_isotime: str) -> Optional[float]:
+    def get_total_duration(self, from_isotime: str, to_isotime: str) -> Optional[float]:
         """Return the total duration for tasks within a time range."""
         raise NotImplementedError()
 
-    def sum_task_durations(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
-        """Return per-task duration totals within a time range."""
+    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+        """Return individual total task durations within a time range."""
+        raise NotImplementedError()
+
+    def get_task_durations_distribution(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+        """Return per-task duration distribution within a time range."""
         raise NotImplementedError()
 
     def commit(self) -> None:

@@ -24,10 +24,22 @@ class ConsoleReport(AbstractTraecklyReport):
         return lines
 
 
-    def create_report(self, data: dict) -> None:
+    def create_report_sum(self, data: dict) -> None:
         from_time = data["from"].replace('T', ' ')
         to_time = data["to"].replace('T', ' ')
-        print(f"Report from {from_time} ... {to_time}")
+        print(f"Total report from {from_time} ... {to_time}")
+
+        header = [('Task', 'Time h:mm')]
+        rows = header + [(task, str(total_time)) for task, total_time in data.get("tasks", [])]
+
+        for line in self._render_table(rows):
+            print(line)
+
+
+    def create_report_distribution(self, data: dict) -> None:
+        from_time = data["from"].replace('T', ' ')
+        to_time = data["to"].replace('T', ' ')
+        print(f"Distribution report from {from_time} ... {to_time}")
 
         header = [('Task', 'Time h:mm')]
         rows = header + [(task, str(total_time)) for task, total_time in data.get("tasks", [])]

@@ -13,8 +13,21 @@ class AbstractTraecklyBackend:
         """
         raise NotImplementedError()
     
-    def get_task_durations(self, from_isotime: str, to_isotime: str) -> dict:
-        """Get task durations for a specified time range.
+    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> dict:
+        """Get task durations sum for a specified time range.
+        
+        Args:
+            from_isotime: Start time in ISO format.
+            to_isotime: End time in ISO format.
+            
+        Returns:
+            Dictionary with 'from', 'to', and 'tasks' (list of tuples).
+        """
+        raise NotImplementedError()
+
+
+    def get_task_durations_distribution(self, from_isotime: str, to_isotime: str) -> dict:
+        """Get task durations distribution for a specified time range.
         
         Args:
             from_isotime: Start time in ISO format.
@@ -52,8 +65,17 @@ class TraecklyBackendBase(AbstractTraecklyBackend):
 class AbstractTraecklyReport:
     """Interface for report generators that display task tracking data."""
     
-    def create_report(self, data: dict) -> None:
-        """Generate and display a report from task duration data.
+    def create_report_sum(self, data: dict) -> None:
+        """Generate a report from task duration sum data.
+        
+        Args:
+            data: Dictionary containing 'from', 'to', and 'tasks' keys.
+        """
+        raise NotImplementedError()
+
+
+    def create_report_distribution(self, data: dict) -> None:
+        """Generate a report from task duration distribution data.
         
         Args:
             data: Dictionary containing 'from', 'to', and 'tasks' keys.

@@ -36,7 +36,7 @@ class TraecklyLoggingBackend(TraecklyBackendBase):
         self._active_task = id
         self._log(f"{id} started")
 
-    def get_task_durations(self, from_isotime: str, to_isotime: str) -> dict:
+    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> dict:
         """Get task durations - not supported by logging backend.
         
         Args:

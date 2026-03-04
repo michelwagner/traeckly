@@ -35,7 +35,7 @@ class FakeStore(AbstractTraecklyStore):
                 entry["duration"] = duration_seconds
                 return
 
-    def sum_total_duration(self, from_isotime: str, to_isotime: str) -> Optional[float]:
+    def get_total_duration(self, from_isotime: str, to_isotime: str) -> Optional[float]:
         durations = [
             entry["duration"] for entry in self.entries
             if entry["duration"] is not None
@@ -43,7 +43,7 @@ class FakeStore(AbstractTraecklyStore):
         ]
         return sum(durations) if durations else None
 
-    def sum_task_durations(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
         totals: Dict[str, float] = {}
         for entry in self.entries:
             if entry["duration"] is None:
@@ -53,6 +53,16 @@ class FakeStore(AbstractTraecklyStore):
             task_name = entry["task"]
             totals[task_name] = totals.get(task_name, 0.0) + float(entry["duration"])
         return [(task, duration) for task, duration in totals.items()]
+
+    def get_task_durations_distribution(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+        entries: List[Tuple[str, Optional[float]]] = []
+        for entry in self.entries:
+            if entry["duration"] is None:
+                continue
+            if not (from_isotime <= entry["starttime"] <= to_isotime):
+                continue
+            entries.append((entry["task"], float(entry["duration"])))
+        return entries
 
     def commit(self) -> None:
         pass
@@ -84,19 +94,45 @@ class TestTraecklyTrackingBackend(unittest.TestCase):
         self.assertEqual(len(store.entries), 1)
         self.assertEqual(store.entries[0]["duration"], 3600.0)
 
-    def test_get_task_durations_formats_output(self) -> None:
+    def test_get_task_durations_sum_formats_output(self) -> None:
         store = FakeStore()
         backend = FixedTimeBackend(store, ["2026-01-01T00:00:00", "2026-01-01T01:00:00"])
 
         backend.start_task("Task A")
         backend.start_task(None)
 
-        result = backend.get_task_durations("2026-01-01T00:00:00", "2026-01-01T02:00:00")
+        result = backend.get_task_durations_sum("2026-01-01T00:00:00", "2026-01-01T02:00:00")
 
         self.assertEqual(result["from"], "2026-01-01T00:00:00")
         self.assertEqual(result["to"], "2026-01-01T02:00:00")
         self.assertIn(("Total", "1:00"), result["tasks"])
         self.assertIn(("Task_A", "1:00"), result["tasks"])
+
+    def test_get_task_durations_distribution_formats_output(self) -> None:
+        store = FakeStore()
+        backend = FixedTimeBackend(
+            store,
+            [
+                "2026-01-01T00:00:00",
+                "2026-01-01T01:00:00",
+                "2026-01-01T01:30:00",
+                "2026-01-01T02:00:00",
+            ],
+        )
+
+        backend.start_task("Task A")
+        backend.start_task(None)
+        backend.start_task("Task B")
+        backend.start_task(None)
+
+        result = backend.get_task_durations_distribution("2026-01-01T00:00:00", "2026-01-01T02:00:00")
+
+        self.assertEqual(result["from"], "2026-01-01T00:00:00")
+        self.assertEqual(result["to"], "2026-01-01T02:00:00")
+        self.assertCountEqual(
+            result["tasks"],
+            [("Task_A", "1:00"), ("Task_B", "0:30")],
+        )
 
 
 if __name__ == "__main__":
