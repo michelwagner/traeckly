@@ -50,7 +50,7 @@ class TraecklySQLiteStore(AbstractTraecklyStore):
         self._database_execute(self._sql_update_duration, (duration_seconds, row_id))
 
 
-    def sum_total_duration(self, from_isotime: str, to_isotime: str) -> Optional[float]:
+    def get_total_duration(self, from_isotime: str, to_isotime: str) -> Optional[float]:
         result = self._database_execute(self._sql_sum_total_duration_from_to, (from_isotime, to_isotime))
         entry = result.fetchone()
         if entry is None:
@@ -60,13 +60,14 @@ class TraecklySQLiteStore(AbstractTraecklyStore):
         return total_duration
 
 
-    def sum_task_durations(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+        """Return individual task durations sum within a time range."""
         result = self._database_execute(self._sql_sum_task_duration_from_to, (from_isotime, to_isotime))
         return result.fetchall()
 
 
-    def get_task_durations_sum(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
-        """Return individual task durations within a time range."""
+    def get_task_durations_distribution(self, from_isotime: str, to_isotime: str) -> List[Tuple[str, Optional[float]]]:
+        """Return individual task durations distribution within a time range."""
         result = self._database_execute(self._sql_get_task_durations_from_to, (from_isotime, to_isotime))
         return result.fetchall()
 
@@ -134,12 +135,28 @@ class TraecklyBackend(TraecklyBackendBase):
         """Return total and per-task durations for a time range."""
         tasks = []
 
-        total_duration = self.store.sum_total_duration(from_isotime, to_isotime)
+        total_duration = self.store.get_total_duration(from_isotime, to_isotime)
         total_task = self._get_task_duration('Total', total_duration)
         if total_task is not None:
             tasks.append(total_task)
 
-        entries = self.store.sum_task_durations(from_isotime, to_isotime)
+        entries = self.store.get_task_durations_sum(from_isotime, to_isotime)
+
+        for entry in entries:
+            task_name = entry[0]
+            task_duration_seconds = entry[1]
+            task = self._get_task_duration(task_name, task_duration_seconds)
+            if task is not None:
+                tasks.append(task)
+
+        return {"from": from_isotime, "to": to_isotime, "tasks": tasks}
+
+
+    def get_task_durations_distribution(self, from_isotime: str, to_isotime: str) -> Dict[str, Union[str, List[Tuple[str, str]]]]:
+        """task durations for a time range."""
+        tasks = []
+
+        entries = self.store.get_task_durations_distribution(from_isotime, to_isotime)
 
         for entry in entries:
             task_name = entry[0]
